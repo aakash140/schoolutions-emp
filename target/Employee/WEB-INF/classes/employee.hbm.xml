@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC 
+ "-//Hibernate/Hibernate Mapping DTD//EN"
+ "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.school.employee.bean.Employee" table="EMP_RCRD">
+		<meta attribute="class-description">
+			This is an employee POJO class. 
+		</meta>
+		<id 		 name="empID" 			column="EMP_ID"></id>
+		<property 	 name="firstName" 		column="EMP_FNAME"></property>
+		<property 	 name="middleName" 		column="EMP_MNAME"></property>
+		<property 	 name="lastName" 		column="EMP_LNAME"></property>
+		<property 	 name="designation" 	column="EMP_DESIG"></property>
+		<property 	 name="employeeType" 	column="EMP_TYP"></property>
+		<property 	 name="gender" 			column="EMP_GNDR"></property>
+		<property 	 name="bloodGroup" 		column="EMP_BG"></property>
+		<property 	 name="DOB" 			column="EMP_DOB"		type="calendar_date"></property>
+		<property 	 name="DOJ" 			column="EMP_DOJ"		type="calendar_date"></property>
+		<property 	 name="nameOfFather" 	column="EMP_FATH_NAME"></property>
+		<property 	 name="nameOfMother" 	column="EMP_MOTH_NAME"></property>
+		<property 	 name="maritalStatus" 	column="EMP_MRTL"></property>
+		<property 	 name="nameOfSpouse" 	column="EMP_SPOUS_NAME"></property>
+		<property 	 name="nationalityID" 	column="EMP_NAT_ID"></property>
+		<property 	 name="PANnumber" 		column="EMP_PAN_ID"></property>
+		<property 	 name="experience" 		column="EMP_EXP"></property>
+		
+		<many-to-one name="contact" 		column="CNTCT_ID"
+					 unique="true"			class="com.school.employee.bean.ContactDetails"
+					 not-null="true"		cascade="all"/>
+		
+		<set 		 name="addressSet"		cascade="all">
+			<key 	 column="EMP_ID"/>
+			<one-to-many class="com.school.employee.bean.Address"/>
+		</set>
+		
+	</class>
+</hibernate-mapping>

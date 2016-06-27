@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC 
+ "-//Hibernate/Hibernate Mapping DTD//EN"
+ "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+ 
+ <hibernate-mapping>
+ 	<class name="com.school.employee.bean.DocumentRecords" table="DOC_RCRD">
+ 		<meta attribute="class-description">
+ 			POJO class for Document Records
+ 		</meta>
+ 		<composite-id>
+ 			<key-property name="ownerID"		column="OWNER_ID"></key-property>
+ 			<key-property name="docType"		column="DOC_TYPE"></key-property>
+ 		</composite-id>
+ 		<property		  name="docLocation"    column="DOC_LOC"></property>
+ 	</class>
+ </hibernate-mapping>

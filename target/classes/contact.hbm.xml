@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC 
+ "-//Hibernate/Hibernate Mapping DTD//EN"
+ "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+ 
+ <hibernate-mapping>
+ 	<class	name="com.school.employee.bean.ContactDetails" table="EMP_CNTCT">
+ 		<meta attribute="class-description">
+ 			Contact Details POJO
+ 		</meta>
+ 		<id			name="contactID"		column="CNTC_ID">
+ 			<generator class="native"/>
+ 		</id>
+ 		<property	name="email"			column="EMAIL"></property>
+ 		<property	name="mobileNumber1"	column="MOBILE1"></property>
+ 		<property	name="mobileNumber2"	column="MOBILE2"></property>
+ 		<property	name="homeNumber"		column="HOME"></property>
+ 		<property	name="whatsAppNumber"	column="WHATSAPP"></property>
+ 	</class>
+ </hibernate-mapping>

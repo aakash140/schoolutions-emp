@@ -1,0 +1,14 @@
+com\school\employee\bean\LoginCredentials.class
+com\school\employee\bean\Address.class
+com\school\employee\dao\EmployeeDAOImpl.class
+com\school\util\DocumentProp.class
+com\school\util\FileIOUtil.class
+com\school\employee\dao\EmployeeDAO.class
+com\school\employee\ws\EmployeeWS.class
+com\school\util\PasswordUtil.class
+com\school\employee\bean\DocumentRecords.class
+com\school\employee\ws\EmployeeWSImpl.class
+com\school\employee\test\TestApp.class
+com\school\employee\bean\ContactDetails.class
+com\school\employee\bean\Employee.class
+com\school\util\StatusCode.class

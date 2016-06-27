@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC 
+ "-//Hibernate/Hibernate Mapping DTD//EN"
+ "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+ 
+<hibernate-mapping>
+	<class name="com.school.employee.bean.Address" table="EMP_ADRS">
+		<meta attribute="class-description">
+			Address POJO
+		</meta>
+		<id				name="addressID"		column="ADRS_ID">
+			<generator class="native"/>	
+		</id>
+		<property		name="addressType" 		column="ADRS_TYPE"></property>
+		<property		name="addressLine"		column="ADRS_LINE"></property>
+		<property		name="state"			column="STATE"></property>
+		<property 		name="city"				column="CITY"></property>
+		<property 		name="pincode"			column="PINCODE"></property>
+	</class>
+</hibernate-mapping>
