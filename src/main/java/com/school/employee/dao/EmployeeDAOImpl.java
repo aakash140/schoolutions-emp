@@ -1,12 +1,13 @@
 package com.school.employee.dao;
 
+import java.io.Serializable;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.hibernate.query.Query;
 
 @SuppressWarnings("deprecation")
 public class EmployeeDAOImpl implements EmployeeDAO {
@@ -39,15 +40,28 @@ public class EmployeeDAOImpl implements EmployeeDAO {
 	}
 
 	@Override
-	public Object queryDatabase(String query) {
-		logger.info("Querying database with SQL Query: " + query);
+	public <T extends Object> T get(Class<T> classObj, Serializable id) {
+		logger.info("Fetching " + classObj.toGenericString() + " details with identifier id '" + id + "'");
 		Session session = sessionFactory.openSession();
-		Query queryObj = session.createQuery(query);
-		List<Object> list = queryObj.list();
-		if (list.size() > 0) {
-			return list.get(0);
-		}
-		return null;
+		return session.get(classObj, id);
+
 	}
 
+	@Override
+	public Object getQueryResult(String query) {
+		logger.info("Querying database with SQL Query: " + query);
+		Session session = sessionFactory.openSession();
+		Query<Object> queryObj = session.createQuery(query);
+		Object obj = queryObj.getSingleResult();
+		return obj;
+	}
+
+	@Override
+	public List<Object> getQueryResults(String query) {
+		logger.info("Querying database with SQL Query: " + query);
+		Session session = sessionFactory.openSession();
+		Query<Object> queryObj = session.createQuery(query);
+		List<Object> resultList = queryObj.list();
+		return resultList;
+	}
 }

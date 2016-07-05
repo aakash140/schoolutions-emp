@@ -1,7 +1,6 @@
 package com.school.employee.test;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.util.Calendar;
 import java.util.HashSet;
 import java.util.Set;
@@ -22,20 +21,21 @@ public class TestApp {
 		// System.out.println(empWs.getEmployee("1234").getFirstName());
 
 		// addEmp(empWs);
-		String fileName = "Standard Chartered Bank CardNet.pdf";
+		String fileName = "Aadhaar.pdf";
 		File file = new File("C:/Users/Home/Desktop/" + fileName);
 		FileDataSource fds = new FileDataSource(file);
 		DataHandler dh = new DataHandler(fds);
 		String ownerID = "1234";
 		int ownerType = DocumentProp.OWNER_EMP;
 		int fileType = DocumentProp.AADHAR;
-		System.out.println(empWs.updateFile(dh, ownerID, ownerType, fileType, fileName));
+		System.out.println(empWs.saveFile(dh, ownerID, ownerType, fileType, fileName));
 
-		dh = empWs.getFile("1234", DocumentProp.AADHAR);
-		File f = new File("F:/temp/" + dh.getName());
-		System.out.println(f.createNewFile());
-		dh.writeTo(new FileOutputStream(f));
-		System.out.println("Downloaded");
+		/*
+		 * dh = empWs.getFile("1234", DocumentProp.AADHAR); File f = new
+		 * File("F:/temp/" + dh.getName());
+		 * System.out.println(f.createNewFile()); dh.writeTo(new
+		 * FileOutputStream(f)); System.out.println("Downloaded");
+		 */
 
 		// System.out.println(empWs.createCredentials("1234",
 		// "@scorpio123@".toCharArray()));

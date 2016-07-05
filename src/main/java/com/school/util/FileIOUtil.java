@@ -57,7 +57,6 @@ public class FileIOUtil {
 		fileDest = configureDestination(fileType, fileName, ownerID, ownerType);
 		try {
 			File file = new File(fileDest);
-			file.createNewFile();
 			FileOutputStream fout = new FileOutputStream(fileDest);
 			logger.info("Uploading " + fileName + " for PersonID: " + ownerID);
 			dh.writeTo(fout);
@@ -112,7 +111,11 @@ public class FileIOUtil {
 			break;
 		}
 
-		fileDest += ownerID + File.separator + fileName;
+		fileDest += ownerID + File.separator;
+		File temp = new File(fileDest);
+		temp.mkdirs();
+		fileDest += fileName;
+
 		return fileDest;
 	}
 

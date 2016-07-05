@@ -11,9 +11,10 @@ import javax.jws.WebService;
 import javax.jws.soap.SOAPBinding;
 import javax.jws.soap.SOAPBinding.Style;
 
+import com.school.employee.bean.DocumentRecords;
 import com.school.employee.bean.Employee;
 
-@WebService(name = "Employee")
+@WebService
 @SOAPBinding(style = Style.RPC)
 public interface EmployeeWS {
 
@@ -28,6 +29,7 @@ public interface EmployeeWS {
 	public int updateEmployee(@WebParam(partName = "employeeDetailsObject") Employee employee);
 
 	@WebMethod
+	@WebResult(partName = "ResultCode")
 	public int isAuthorized(@WebParam(partName = "userID") String userID,
 			@WebParam(partName = "loginPassword") char[] password)
 			throws InvalidKeySpecException, NoSuchAlgorithmException;
@@ -43,19 +45,23 @@ public interface EmployeeWS {
 			@WebParam(partName = "newPassword") char[] newPassword);
 
 	@WebMethod(operationName = "downloadFile")
-	@WebResult(partName = "Byte[]File")
-	public DataHandler getFile(@WebParam(partName = "Student/Employee ID") String ownerID,
-			@WebParam(partName = "Type of Document/File") int fileType);
+	@WebResult(partName = "ByteArray")
+	public DataHandler getFile(@WebParam(partName = "DocOwnerID") String ownerID,
+			@WebParam(partName = "DocType") int fileType);
 
 	@WebMethod(operationName = "uploadFile")
 	@WebResult(partName = "UploadStatus")
-	public int saveFile(@WebParam(partName = "Byte[]File") DataHandler dh,
+	public int saveFile(@WebParam(partName = "ByteArray") DataHandler dh,
 			@WebParam(partName = "FileOwnerID") String ownerID, @WebParam(partName = "FileOwnerType") int ownerType,
 			@WebParam(partName = "FileType") int fileType, @WebParam(partName = "FileName") String fileName);
 
-	@WebMethod(operationName = "uploadFile")
+	@WebMethod(operationName = "updateFile")
 	@WebResult(partName = "UploadStatus")
-	public int updateFile(@WebParam(partName = "Byte[]File") DataHandler dh,
+	public int updateFile(@WebParam(partName = "ByteArray") DataHandler dh,
 			@WebParam(partName = "FileOwnerID") String ownerID, @WebParam(partName = "FileOwnerType") int ownerType,
 			@WebParam(partName = "FileType") int fileType, @WebParam(partName = "FileName") String fileName);
+
+	@WebMethod
+	@WebResult(partName = "DocRecordsArray")
+	public DocumentRecords[] getFileNames(@WebParam(partName = "DocOwnerID") String ownerID);
 }

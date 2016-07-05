@@ -4,6 +4,7 @@ import java.io.File;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import javax.activation.DataHandler;
 import javax.jws.WebParam;
@@ -43,7 +44,7 @@ public class EmployeeWSImpl implements EmployeeWS {
 		logger.info("Getting details for Employee ID: " + employeeID);
 		String query = "FROM Employee EMP WHERE EMP.empID='" + employeeID + "'";
 		try {
-			Object obj = dao.queryDatabase(query);
+			Object obj = dao.getQueryResult(query);
 			if (obj == null) {
 				logger.info("Employee with Employee ID: " + employeeID + " does not exist in records.");
 			}
@@ -96,7 +97,7 @@ public class EmployeeWSImpl implements EmployeeWS {
 		logger.info("Verifying credentials for User ID:" + userID);
 		if (isEmployee(userID)) {
 			String query = "FROM LoginCredentials LC WHERE LC.userID='" + userID + "'";
-			Object obj = dao.queryDatabase(query);
+			Object obj = dao.getQueryResult(query);
 			if (obj != null) {
 				LoginCredentials credentials = (LoginCredentials) obj;
 				try {
@@ -167,7 +168,7 @@ public class EmployeeWSImpl implements EmployeeWS {
 	@Override
 	public int updatePassword(String userID, char[] oldPassword, char[] newPassword) {
 		String query = "FROM LoginCredentials LC WHERE LC.userID='" + userID + "'";
-		Object obj = dao.queryDatabase(query);
+		Object obj = dao.getQueryResult(query);
 		LoginCredentials credentials = (LoginCredentials) obj;
 		try {
 			if (credentials.getFailedAttempts() != 5
@@ -193,7 +194,7 @@ public class EmployeeWSImpl implements EmployeeWS {
 	@Override
 	public DataHandler getFile(String ownerID, int fileType) {
 		String query = "SELECT DR.docLocation FROM DocumentRecords DR WHERE DR.docType='" + fileType + "'";
-		Object result = dao.queryDatabase(query);
+		Object result = dao.getQueryResult(query);
 		DataHandler dh = null;
 		if (result != null) {
 			String fileLoc = (String) result;
@@ -246,15 +247,31 @@ public class EmployeeWSImpl implements EmployeeWS {
 
 	}
 
+	@Override
+	public DocumentRecords[] getFileNames(String ownerID) {
+		String query = "FROM DocumentRecords DR where DR.ownerID='" + ownerID + "'";
+		List<Object> resultList = dao.getQueryResults(query);
+		if (resultList != null) {
+			DocumentRecords[] docArray = new DocumentRecords[resultList.size()];
+			Object objArray[] = resultList.toArray();
+			for (int i = 0; i < objArray.length; i++) {
+				DocumentRecords docRecrd = (DocumentRecords) objArray[i];
+				docArray[i] = docRecrd;
+			}
+			return docArray;
+		}
+		return null;
+	}
+
 	private boolean isEmployee(String userID) {
 		String query = "SELECT EMP.empID FROM Employee EMP WHERE EMP.empID='" + userID + "'";
-		Object obj = dao.queryDatabase(query);
+		Object obj = dao.getQueryResult(query);
 		return obj != null;
 	}
 
 	private boolean isAlreadySignedUp(String userID) {
 		String query = "SELECT LC.userID FROM LoginCredentials LC WHERE LC.userID='" + userID + "'";
-		Object obj = dao.queryDatabase(query);
+		Object obj = dao.getQueryResult(query);
 		return obj != null;
 	}
 
@@ -273,4 +290,5 @@ public class EmployeeWSImpl implements EmployeeWS {
 		LocalDateTime now = LocalDateTime.now();
 		credentials.setLastLoginTimestamp(now);
 	}
+
 }
