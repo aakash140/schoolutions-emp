@@ -8,6 +8,7 @@
 		<meta attribute="class-description">
 			This is an employee POJO class. 
 		</meta>
+		<cache 		 usage="read-write"/>
 		<id 		 name="empID" 			column="EMP_ID"></id>
 		<property 	 name="firstName" 		column="EMP_FNAME"></property>
 		<property 	 name="middleName" 		column="EMP_MNAME"></property>

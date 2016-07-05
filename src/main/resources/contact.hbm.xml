@@ -8,6 +8,7 @@
  		<meta attribute="class-description">
  			Contact Details POJO
  		</meta>
+ 		<cache 		usage="read-write"/>
  		<id			name="contactID"		column="CNTC_ID">
  			<generator class="native"/>
  		</id>

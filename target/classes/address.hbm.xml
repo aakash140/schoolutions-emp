@@ -8,6 +8,7 @@
 		<meta attribute="class-description">
 			Address POJO
 		</meta>
+		<cache 			usage="read-write" />
 		<id				name="addressID"		column="ADRS_ID">
 			<generator class="native"/>	
 		</id>
