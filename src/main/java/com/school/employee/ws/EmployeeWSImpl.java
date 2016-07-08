@@ -107,10 +107,10 @@ public class EmployeeWSImpl implements EmployeeWS {
 	public int isAuthorized(String userID, char[] password) {
 		logger.info("Verifying credentials for User ID:" + userID);
 		if (isEmployee(userID)) {
-			String query = "FROM LoginCredentials LC WHERE LC.userID='" + userID + "'";
-			Object obj = dao.getQueryResult(query);
-			if (obj != null) {
-				LoginCredentials credentials = (LoginCredentials) obj;
+			// String query = "FROM LoginCredentials LC WHERE LC.userID='" +
+			// userID + "'";
+			LoginCredentials credentials = dao.get(LoginCredentials.class, userID);
+			if (credentials != null) {
 				try {
 					if (credentials.getFailedAttempts() != 5
 							&& PasswordUtil.validatePassword(credentials.getPassword(), password)) {
