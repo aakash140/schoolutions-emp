@@ -39,16 +39,27 @@ public class EmployeeWSImpl implements EmployeeWS {
 		dao = (EmployeeDAO) factory.getBean("employeeDAO");
 	}
 
+	/*
+	 * @Override public Employee getEmployee(String employeeID) {
+	 * logger.info("Getting details for Employee ID: " + employeeID); String
+	 * query = "FROM Employee EMP WHERE EMP.empID='" + employeeID + "'"; try {
+	 * Object obj = dao.getQueryResult(query); if (obj == null) {
+	 * logger.info("Employee with Employee ID: " + employeeID +
+	 * " does not exist in records."); } return (Employee) obj; } catch
+	 * (Exception exception) { logger.error("STATUS CODE: " +
+	 * StatusCode.DBEERROR +
+	 * ":Exception occured while fetching details for Employee ID: " +
+	 * employeeID + ":" + exception); return null; } }
+	 */
 	@Override
 	public Employee getEmployee(String employeeID) {
 		logger.info("Getting details for Employee ID: " + employeeID);
-		String query = "FROM Employee EMP WHERE EMP.empID='" + employeeID + "'";
 		try {
-			Object obj = dao.getQueryResult(query);
-			if (obj == null) {
+			Employee emp = dao.get(Employee.class, "1234");
+			if (emp == null) {
 				logger.info("Employee with Employee ID: " + employeeID + " does not exist in records.");
 			}
-			return (Employee) obj;
+			return emp;
 		} catch (Exception exception) {
 			logger.error("STATUS CODE: " + StatusCode.DBEERROR
 					+ ":Exception occured while fetching details for Employee ID: " + employeeID + ":" + exception);
@@ -193,6 +204,7 @@ public class EmployeeWSImpl implements EmployeeWS {
 
 	@Override
 	public DataHandler getFile(String ownerID, int fileType) {
+		logger.info("Getting file with File Type '" + fileType + "' for owner '" + ownerID + "'");
 		String query = "SELECT DR.docLocation FROM DocumentRecords DR WHERE DR.docType='" + fileType + "'";
 		Object result = dao.getQueryResult(query);
 		DataHandler dh = null;
@@ -201,11 +213,13 @@ public class EmployeeWSImpl implements EmployeeWS {
 			FileIOUtil fileUtil = new FileIOUtil();
 			dh = fileUtil.getFile(fileLoc);
 		}
+		logger.info("File with File Type '" + fileType + "' for owner '" + ownerID + "' does not exist.");
 		return dh;
 	}
 
 	@Override
 	public int saveFile(DataHandler dh, String ownerID, int ownerType, int fileType, String fileName) {
+		logger.info("Saving file with File Type '" + fileType + "' for owner '" + ownerID + "'");
 		FileIOUtil fileUtil = new FileIOUtil();
 		File savedFile = fileUtil.saveFile(dh, ownerID, ownerType, fileType, fileName);
 		if (savedFile != null && savedFile.exists()) {
@@ -227,6 +241,7 @@ public class EmployeeWSImpl implements EmployeeWS {
 
 	@Override
 	public int updateFile(DataHandler dh, String ownerID, int ownerType, int fileType, String fileName) {
+		logger.info("Updating file with File Type '" + fileType + "' for owner '" + ownerID + "'");
 		FileIOUtil fileUtil = new FileIOUtil();
 		File savedFile = fileUtil.saveFile(dh, ownerID, ownerType, fileType, fileName);
 		if (savedFile != null && savedFile.exists()) {

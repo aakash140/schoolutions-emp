@@ -11,6 +11,7 @@ public class Employee {
 	private String lastName;
 	private String designation;
 	private String employeeType;
+	private int department;
 	private String gender;
 	private String bloodGroup;
 	private Calendar DOB;
@@ -71,6 +72,14 @@ public class Employee {
 
 	public void setEmployeeType(String employeeType) {
 		this.employeeType = employeeType;
+	}
+
+	public int getDepartment() {
+		return department;
+	}
+
+	public void setDepartment(int department) {
+		this.department = department;
 	}
 
 	public String getGender() {

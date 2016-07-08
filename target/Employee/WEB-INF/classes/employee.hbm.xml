@@ -8,12 +8,14 @@
 		<meta attribute="class-description">
 			This is an employee POJO class. 
 		</meta>
+		<cache 		 usage="read-write"/>
 		<id 		 name="empID" 			column="EMP_ID"></id>
 		<property 	 name="firstName" 		column="EMP_FNAME"></property>
 		<property 	 name="middleName" 		column="EMP_MNAME"></property>
 		<property 	 name="lastName" 		column="EMP_LNAME"></property>
 		<property 	 name="designation" 	column="EMP_DESIG"></property>
 		<property 	 name="employeeType" 	column="EMP_TYP"></property>
+		<property 	 name="department" 	    column="EMP_DEPT"></property>
 		<property 	 name="gender" 			column="EMP_GNDR"></property>
 		<property 	 name="bloodGroup" 		column="EMP_BG"></property>
 		<property 	 name="DOB" 			column="EMP_DOB"		type="calendar_date"></property>

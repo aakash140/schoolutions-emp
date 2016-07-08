@@ -3,6 +3,10 @@ package com.school.employee.dao;
 import java.io.Serializable;
 import java.util.List;
 
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
+import javax.servlet.annotation.WebListener;
+
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -10,7 +14,8 @@ import org.hibernate.Transaction;
 import org.hibernate.query.Query;
 
 @SuppressWarnings("deprecation")
-public class EmployeeDAOImpl implements EmployeeDAO {
+@WebListener
+public class EmployeeDAOImpl implements EmployeeDAO, ServletContextListener {
 
 	private Logger logger = Logger.getLogger(EmployeeDAOImpl.class);
 	public SessionFactory sessionFactory;
@@ -47,6 +52,7 @@ public class EmployeeDAOImpl implements EmployeeDAO {
 
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public Object getQueryResult(String query) {
 		logger.info("Querying database with SQL Query: " + query);
@@ -56,6 +62,7 @@ public class EmployeeDAOImpl implements EmployeeDAO {
 		return obj;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public List<Object> getQueryResults(String query) {
 		logger.info("Querying database with SQL Query: " + query);
@@ -64,4 +71,27 @@ public class EmployeeDAOImpl implements EmployeeDAO {
 		List<Object> resultList = queryObj.list();
 		return resultList;
 	}
+
+	@Override
+	public void contextDestroyed(ServletContextEvent event) {
+		logger.info("Releasing resources...");
+		if (sessionFactory != null && sessionFactory.isOpen())
+			sessionFactory.close();
+
+/*		ClassLoader cl = Thread.currentThread().getContextClassLoader();
+
+		Set<Thread> threadSet = Thread.getAllStackTraces().keySet();
+		Thread[] threadArray = threadSet.toArray(new Thread[threadSet.size()]);
+
+		for (Thread t : threadArray) {
+			if (t.getContextClassLoader() == cl) {
+				t.interrupt();
+			}
+		}*/
+	}
+
+	@Override
+	public void contextInitialized(ServletContextEvent event) {
+	}
+
 }
