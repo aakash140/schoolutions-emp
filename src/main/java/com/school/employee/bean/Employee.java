@@ -1,6 +1,7 @@
 package com.school.employee.bean;
 
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Set;
 
 public class Employee {
@@ -25,6 +26,8 @@ public class Employee {
 	private float experience;
 	private ContactDetails contact;
 	private Set<Address> addressSet;
+	private int status = 1;
+	private Date version;
 
 	public String getEmpID() {
 		return empID;
@@ -184,5 +187,21 @@ public class Employee {
 
 	public void setAddressSet(Set<Address> addressSet) {
 		this.addressSet = addressSet;
+	}
+
+	public int getStatus() {
+		return status;
+	}
+
+	public void setStatus(int status) {
+		this.status = status;
+	}
+
+	public Date getVersion() {
+		return version;
+	}
+
+	public void setVersion(Date version) {
+		this.version = version;
 	}
 }

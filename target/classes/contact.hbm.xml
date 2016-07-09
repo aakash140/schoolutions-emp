@@ -8,10 +8,14 @@
  		<meta attribute="class-description">
  			Contact Details POJO
  		</meta>
- 		<cache 		usage="read-write"/>
+ 		<!-- <cache 		usage="read-write"/> -->
  		<id			name="contactID"		column="CNTC_ID">
  			<generator class="native"/>
  		</id>
+ 		<!-- Following version property is not persisting the time stamp in database. So commented it. -->  
+		<!-- <version     name="version" 		column="RCRD_VER"       type="timestamp" generated="always"/> -->
+		
+		<timestamp 	name="version" 			column="RCRD_VER" source="db"/>
  		<property	name="email"			column="EMAIL"></property>
  		<property	name="mobileNumber1"	column="MOBILE1"></property>
  		<property	name="mobileNumber2"	column="MOBILE2"></property>

@@ -7,7 +7,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import javax.activation.DataHandler;
-import javax.jws.WebParam;
 import javax.jws.WebService;
 
 import org.apache.log4j.Logger;
@@ -51,11 +50,15 @@ public class EmployeeWSImpl implements EmployeeWS {
 	 * ":Exception occured while fetching details for Employee ID: " +
 	 * employeeID + ":" + exception); return null; } }
 	 */
+
 	@Override
 	public Employee getEmployee(String employeeID) {
 		logger.info("Getting details for Employee ID: " + employeeID);
+		Employee emp = null;
 		try {
-			Employee emp = dao.get(Employee.class, "1234");
+			if (isEmployee(employeeID))
+				emp = dao.get(Employee.class, employeeID);
+
 			if (emp == null) {
 				logger.info("Employee with Employee ID: " + employeeID + " does not exist in records.");
 			}
@@ -84,16 +87,36 @@ public class EmployeeWSImpl implements EmployeeWS {
 			return StatusCode.CREATED;
 
 		} catch (Exception exception) {
-			logger.error("STATUS CODE: " + StatusCode.DBEERROR + ": " + exception);
+			logger.error("STATUS CODE: " + StatusCode.DBEERROR + ": Exception occured while saving the employee '"
+					+ employee.getEmpID() + "' : " + exception);
 			return StatusCode.DBEERROR;
 		}
 	}
 
 	@Override
-	public int updateEmployee(@WebParam(partName = "employeeDetailsObject") Employee employee) {
+	public int deactivateEmployee(String employeeID) {
+		String query = "UPDATE Employee EMP SET EMP.status='0' WHERE EMP.empID='" + employeeID + "'";
+		try {
+			if (isEmployee(employeeID)) {
+				int updateResult = dao.update(query);
+				if (updateResult > 0)
+					return StatusCode.OK;
+				else
+					return StatusCode.NOT_FOUND;
+			} else
+				return StatusCode.NOT_FOUND;
+		} catch (Exception exception) {
+			logger.error("STATUS CODE: " + StatusCode.DBEERROR + ": Exception occured while deactivating the employee '"
+					+ employeeID + "' : " + exception);
+			return StatusCode.DBEERROR;
+		}
+	}
+
+	@Override
+	public int updateEmployee(Employee employee) {
 		try {
 			String employeeID = employee.getEmpID();
-			dao.update(employee);
+			dao.updateEntity(employee);
 			logger.info("STATUS CODE: " + StatusCode.OK + ": Employee details for Employee ID " + employeeID
 					+ " have been updated successfully.");
 			return StatusCode.OK;
@@ -116,7 +139,7 @@ public class EmployeeWSImpl implements EmployeeWS {
 							&& PasswordUtil.validatePassword(credentials.getPassword(), password)) {
 						credentials.setFailedAttempts(0);
 						updateLoginTimestamp(credentials);
-						dao.update(credentials);
+						dao.updateEntity(credentials);
 						logger.info("STATUS CODE: " + StatusCode.OK + ": Employee ID " + userID + " is authorized");
 						return StatusCode.OK;
 					} else if (credentials.getFailedAttempts() == 5) {
@@ -185,7 +208,7 @@ public class EmployeeWSImpl implements EmployeeWS {
 			if (credentials.getFailedAttempts() != 5
 					&& PasswordUtil.validatePassword(credentials.getPassword(), oldPassword)) {
 				credentials.setPassword(PasswordUtil.encryptPassword(newPassword));
-				dao.update(credentials);
+				dao.updateEntity(credentials);
 				return StatusCode.OK;
 			} else if (credentials.getFailedAttempts() == 5) {
 				logger.error("STATUS CODE: " + StatusCode.LOCKED_OUT + ": Employee ID " + userID
@@ -250,7 +273,7 @@ public class EmployeeWSImpl implements EmployeeWS {
 				dr.setOwnerID(ownerID);
 				dr.setDocType(fileType);
 				dr.setDocLocation(savedFile.toString());
-				dao.update(dr);
+				dao.updateEntity(dr);
 				return StatusCode.CREATED;
 			} catch (Exception exception) {
 				logger.error("STATUS CODE: " + StatusCode.DBEERROR + " :Error occured while updating doc/file '"
@@ -279,7 +302,7 @@ public class EmployeeWSImpl implements EmployeeWS {
 	}
 
 	private boolean isEmployee(String userID) {
-		String query = "SELECT EMP.empID FROM Employee EMP WHERE EMP.empID='" + userID + "'";
+		String query = "SELECT EMP.empID FROM Employee EMP WHERE EMP.empID='" + userID + "' AND EMP.status='1'";
 		Object obj = dao.getQueryResult(query);
 		return obj != null;
 	}
@@ -294,7 +317,7 @@ public class EmployeeWSImpl implements EmployeeWS {
 		int currentFailedAttempts = credentials.getFailedAttempts();
 		credentials.setFailedAttempts(++currentFailedAttempts);
 		try {
-			dao.update(credentials);
+			dao.updateEntity(credentials);
 			logger.info("Updated invalid login attempts counter for user id " + credentials.getUserID());
 		} catch (Exception exception) {
 			logger.error("STATUS CODE:" + StatusCode.DBEERROR + ": " + exception);

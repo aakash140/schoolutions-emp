@@ -25,6 +25,10 @@ public interface EmployeeWS {
 	@WebResult(partName = "ResultCode")
 	public int updateEmployee(@WebParam(partName = "employeeDetailsObject") Employee employee);
 
+	@WebMethod(operationName = "deleteEmployee")
+	@WebResult(partName = "ResultCode")
+	public int deactivateEmployee(@WebParam(partName = "employeeID") String employeeID);
+
 	@WebMethod
 	@WebResult(partName = "ResultCode")
 	public int isAuthorized(@WebParam(partName = "userID") String userID,

@@ -1,50 +1,26 @@
 package com.school.employee.test;
 
-import java.io.File;
 import java.util.Calendar;
 import java.util.HashSet;
 import java.util.Set;
-
-import javax.activation.DataHandler;
-import javax.activation.FileDataSource;
 
 import com.school.employee.bean.Address;
 import com.school.employee.bean.ContactDetails;
 import com.school.employee.bean.Employee;
 import com.school.employee.ws.EmployeeWSImpl;
-import com.school.util.DocumentProp;
+import com.school.util.DepartmentList;
 
 public class TestApp {
 
 	public static void main(String[] args) throws Exception {
 		EmployeeWSImpl empWs = new EmployeeWSImpl();
-		// System.out.println(empWs.getEmployee("1234").getFirstName());
 
+		empWs.createCredentials("1234", "Pass@123".toCharArray());
 		// addEmp(empWs);
-		String fileName = "Aadhaar.pdf";
-		File file = new File("C:/Users/Home/Desktop/" + fileName);
-		FileDataSource fds = new FileDataSource(file);
-		DataHandler dh = new DataHandler(fds);
-		String ownerID = "1234";
-		int ownerType = DocumentProp.OWNER_EMP;
-		int fileType = DocumentProp.AADHAR;
-		System.out.println(empWs.saveFile(dh, ownerID, ownerType, fileType, fileName));
-
-		/*
-		 * dh = empWs.getFile("1234", DocumentProp.AADHAR); File f = new
-		 * File("F:/temp/" + dh.getName());
-		 * System.out.println(f.createNewFile()); dh.writeTo(new
-		 * FileOutputStream(f)); System.out.println("Downloaded");
-		 */
-
-		// System.out.println(empWs.createCredentials("1234",
-		// "@scorpio123@".toCharArray()));
-
-		// for (int i = 0; i < 5; i++)
-		// System.out.println(empWs.isAuthorized("1234",
-		// "@scorpio123@".toCharArray()));
-		// System.out.println(empWs.updatePassword("1234",
-		// "@scorpio123@".toCharArray(), "@scorpio54321@".toCharArray()));
+		// Employee emp = empWs.getEmployee("1234");
+		// System.out.println(emp.getContact().getWhatsAppNumber());
+		// System.out.println(emp.getAddressSet().toArray());
+		// System.out.println(empWs.deactivateEmployee("1234"));
 	}
 
 	public static void addEmp(EmployeeWSImpl empWs) {
@@ -96,6 +72,7 @@ public class TestApp {
 		emp.setAddressSet(adrsSet);
 		emp.setContact(contact);
 		emp.setEmployeeType("Permanent");
+		emp.setDepartment(DepartmentList.ADMIN);
 
 		empWs.saveEmployee(emp);
 

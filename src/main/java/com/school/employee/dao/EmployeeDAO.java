@@ -7,7 +7,9 @@ public interface EmployeeDAO {
 
 	public void save(Object detailsObject);
 
-	public void update(Object detailsObject);
+	public int update(String query);
+
+	public void updateEntity(Object detailsObject);
 
 	public <T extends Object> T get(Class<T> classObj, Serializable id);
 

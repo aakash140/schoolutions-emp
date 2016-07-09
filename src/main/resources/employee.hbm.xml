@@ -10,6 +10,12 @@
 		</meta>
 		<cache 		 usage="read-write"/>
 		<id 		 name="empID" 			column="EMP_ID"></id>
+		
+		<!-- Following version property is not persisting the time stamp in database. So commented it. -->  
+		<!-- <version     name="version" 		column="RCRD_VER"       type="timestamp" generated="always"/> -->
+		
+		<timestamp 	 name="version" 		column="RCRD_VER" source="db"/>
+		
 		<property 	 name="firstName" 		column="EMP_FNAME"></property>
 		<property 	 name="middleName" 		column="EMP_MNAME"></property>
 		<property 	 name="lastName" 		column="EMP_LNAME"></property>
@@ -27,6 +33,7 @@
 		<property 	 name="nationalityID" 	column="EMP_NAT_ID"></property>
 		<property 	 name="PANnumber" 		column="EMP_PAN_ID"></property>
 		<property 	 name="experience" 		column="EMP_EXP"></property>
+		<property 	 name="status" 		    column="EMP_STATUS"></property>
 		
 		<many-to-one name="contact" 		column="CNTCT_ID"
 					 unique="true"			class="com.school.employee.bean.ContactDetails"

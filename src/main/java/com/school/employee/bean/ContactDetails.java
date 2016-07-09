@@ -1,5 +1,7 @@
 package com.school.employee.bean;
 
+import java.util.Date;
+
 public class ContactDetails {
 
 	private int contactID;
@@ -8,6 +10,7 @@ public class ContactDetails {
 	private String mobileNumber2;
 	private String homeNumber;
 	private String whatsAppNumber;
+	private Date version;
 
 	public int getContactID() {
 		return contactID;
@@ -55,5 +58,13 @@ public class ContactDetails {
 
 	public void setWhatsAppNumber(String whatsAppNumber) {
 		this.whatsAppNumber = whatsAppNumber;
+	}
+
+	public Date getVersion() {
+		return version;
+	}
+
+	public void setVersion(Date version) {
+		this.version = version;
 	}
 }

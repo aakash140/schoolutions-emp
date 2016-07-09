@@ -8,11 +8,14 @@
  		<meta attribute="class-description">
  			POJO class for Document Records
  		</meta>
- 		<cache 			  usage="read-write"/>
+ 		<!-- <cache 			  usage="read-write"/> -->
  		<composite-id>
  			<key-property name="ownerID"		column="OWNER_ID"></key-property>
  			<key-property name="docType"		column="DOC_TYPE"></key-property>
  		</composite-id>
+ 		<!-- Following version property is not persisting the time stamp in database. So commented it. -->  
+		<!-- <version     name="version" 		column="RCRD_VER"       type="timestamp" generated="always"/> -->
+		<timestamp 		  name="version" 		column="RCRD_VER" source="db"/>
  		<property		  name="docLocation"    column="DOC_LOC"></property>
  	</class>
  </hibernate-mapping>

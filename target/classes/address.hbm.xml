@@ -8,10 +8,14 @@
 		<meta attribute="class-description">
 			Address POJO
 		</meta>
-		<cache 			usage="read-write" />
+		<!-- <cache 			usage="read-write" /> -->
 		<id				name="addressID"		column="ADRS_ID">
 			<generator class="native"/>	
 		</id>
+		<!-- Following version property is not persisting the time stamp in database. So commented it. -->  
+		<!-- <version     name="version" 		column="RCRD_VER"       type="timestamp" generated="always"/> -->
+		
+		<timestamp 		name="version" 			column="RCRD_VER" source="db"/>
 		<property		name="addressType" 		column="ADRS_TYPE"></property>
 		<property		name="addressLine"		column="ADRS_LINE"></property>
 		<property		name="state"			column="STATE"></property>

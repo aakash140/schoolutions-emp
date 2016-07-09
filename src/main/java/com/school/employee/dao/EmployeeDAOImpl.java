@@ -13,7 +13,6 @@ import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.query.Query;
 
-@SuppressWarnings("deprecation")
 @WebListener
 public class EmployeeDAOImpl implements EmployeeDAO, ServletContextListener {
 
@@ -34,8 +33,20 @@ public class EmployeeDAOImpl implements EmployeeDAO, ServletContextListener {
 		session.close();
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public void update(Object detailsObject) {
+	public int update(String query) {
+		logger.info("Updating database record with SQL query: " + query);
+		Session session = sessionFactory.openSession();
+		Transaction trn = session.beginTransaction();
+		Query<Object> queryObj = session.createQuery(query);
+		int result = queryObj.executeUpdate();
+		trn.commit();
+		return result;
+	}
+
+	@Override
+	public void updateEntity(Object detailsObject) {
 		logger.info("Updating detailsObject: " + detailsObject);
 		Session session = sessionFactory.openSession();
 		Transaction trn = session.beginTransaction();
@@ -58,8 +69,12 @@ public class EmployeeDAOImpl implements EmployeeDAO, ServletContextListener {
 		logger.info("Querying database with SQL Query: " + query);
 		Session session = sessionFactory.openSession();
 		Query<Object> queryObj = session.createQuery(query);
-		Object obj = queryObj.getSingleResult();
-		return obj;
+		List<Object> resultList = queryObj.getResultList();
+		if (resultList != null && resultList.size() > 0) {
+			for (Object obj : resultList)
+				return obj;
+		}
+		return null;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -68,7 +83,7 @@ public class EmployeeDAOImpl implements EmployeeDAO, ServletContextListener {
 		logger.info("Querying database with SQL Query: " + query);
 		Session session = sessionFactory.openSession();
 		Query<Object> queryObj = session.createQuery(query);
-		List<Object> resultList = queryObj.list();
+		List<Object> resultList = queryObj.getResultList();
 		return resultList;
 	}
 
@@ -78,16 +93,15 @@ public class EmployeeDAOImpl implements EmployeeDAO, ServletContextListener {
 		if (sessionFactory != null && sessionFactory.isOpen())
 			sessionFactory.close();
 
-/*		ClassLoader cl = Thread.currentThread().getContextClassLoader();
-
-		Set<Thread> threadSet = Thread.getAllStackTraces().keySet();
-		Thread[] threadArray = threadSet.toArray(new Thread[threadSet.size()]);
-
-		for (Thread t : threadArray) {
-			if (t.getContextClassLoader() == cl) {
-				t.interrupt();
-			}
-		}*/
+		/*
+		 * ClassLoader cl = Thread.currentThread().getContextClassLoader();
+		 *
+		 * Set<Thread> threadSet = Thread.getAllStackTraces().keySet(); Thread[]
+		 * threadArray = threadSet.toArray(new Thread[threadSet.size()]);
+		 *
+		 * for (Thread t : threadArray) { if (t.getContextClassLoader() == cl) {
+		 * t.interrupt(); } }
+		 */
 	}
 
 	@Override

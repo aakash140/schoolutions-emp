@@ -1,5 +1,7 @@
 package com.school.employee.bean;
 
+import java.util.Date;
+
 public class Address {
 
 	private int addressID;
@@ -8,6 +10,7 @@ public class Address {
 	private String state;
 	private String city;
 	private String pincode;
+	private Date version;
 
 	public int getAddressID() {
 		return addressID;
@@ -86,5 +89,13 @@ public class Address {
 		hash = 31 * hash + (null == city ? 0 : city.hashCode());
 		hash = 31 * hash + (null == pincode ? 0 : pincode.hashCode());
 		return hash;
+	}
+
+	public Date getVersion() {
+		return version;
+	}
+
+	public void setVersion(Date version) {
+		this.version = version;
 	}
 }

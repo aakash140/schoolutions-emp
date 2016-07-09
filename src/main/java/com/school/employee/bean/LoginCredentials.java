@@ -1,6 +1,7 @@
 package com.school.employee.bean;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 
 public class LoginCredentials {
 
@@ -8,6 +9,7 @@ public class LoginCredentials {
 	private String password;
 	private int failedAttempts;
 	private LocalDateTime lastLoginTimestamp;
+	private Date version;
 
 	public String getUserID() {
 		return userID;
@@ -39,5 +41,13 @@ public class LoginCredentials {
 
 	public void setLastLoginTimestamp(LocalDateTime lastLoginTimestamp) {
 		this.lastLoginTimestamp = lastLoginTimestamp;
+	}
+
+	public Date getVersion() {
+		return version;
+	}
+
+	public void setVersion(Date version) {
+		this.version = version;
 	}
 }

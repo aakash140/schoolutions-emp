@@ -1,6 +1,7 @@
 package com.school.employee.bean;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * Implemented Serializable as it has composite key.
@@ -15,6 +16,7 @@ public class DocumentRecords implements Serializable {
 	private String ownerID;
 	private int docType;
 	private String docLocation;
+	private Date version;
 
 	public String getOwnerID() {
 		return ownerID;
@@ -38,5 +40,13 @@ public class DocumentRecords implements Serializable {
 
 	public void setDocLocation(String docLocation) {
 		this.docLocation = docLocation;
+	}
+
+	public Date getVersion() {
+		return version;
+	}
+
+	public void setVersion(Date version) {
+		this.version = version;
 	}
 }
