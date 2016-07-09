@@ -10,4 +10,5 @@ public interface DepartmentList {
 	int SECURITY = 6;
 	int TRANSPORT = 7;
 	int LAB = 8;
+	int UNKNOWN = 0;
 }
