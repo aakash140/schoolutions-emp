@@ -35,7 +35,7 @@ public class PasswordUtil {
 		return encryptedPassword;
 	}
 
-	public static boolean validatePassword(String storedPassword, char[] enteredPassword)
+	public static boolean isvalidPassword(String storedPassword, char[] enteredPassword)
 			throws NoSuchAlgorithmException, InvalidKeySpecException {
 		logger.info("Comparing and Validating passwords");
 		String[] elements = storedPassword.split(":");

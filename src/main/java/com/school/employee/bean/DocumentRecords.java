@@ -49,4 +49,30 @@ public class DocumentRecords implements Serializable {
 	public void setVersion(Date version) {
 		this.version = version;
 	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+
+		if (obj == null || (this.getClass() != obj.getClass()))
+			return false;
+
+		DocumentRecords doc = (DocumentRecords) obj;
+
+		if (this.ownerID.equalsIgnoreCase(doc.getOwnerID()) && (this.getDocType() == doc.getDocType())
+				&& (this.getDocLocation().equalsIgnoreCase(doc.getDocLocation()))) {
+			return true;
+		}
+
+		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		int hash = 7 + docType;
+		hash = 31 * hash + (null == ownerID ? 0 : ownerID.hashCode());
+		hash = 31 * hash + (null == docLocation ? 0 : docLocation.hashCode());
+		return hash;
+	}
 }

@@ -13,14 +13,22 @@ import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.query.Query;
 
+import com.school.util.StatusCode;
+
 @WebListener
 public class EmployeeDAOImpl implements EmployeeDAO, ServletContextListener {
 
 	private Logger logger = Logger.getLogger(EmployeeDAOImpl.class);
-	public SessionFactory sessionFactory;
+	private SessionFactory sessionFactory;
+	public Session globalSession;
 
 	public void setSessionFactory(SessionFactory sessionFactory) {
 		this.sessionFactory = sessionFactory;
+		setGlobalSession();
+	}
+
+	private void setGlobalSession() {
+		globalSession = sessionFactory.openSession();
 	}
 
 	@Override
@@ -40,6 +48,7 @@ public class EmployeeDAOImpl implements EmployeeDAO, ServletContextListener {
 		Session session = sessionFactory.openSession();
 		Transaction trn = session.beginTransaction();
 		Query<Object> queryObj = session.createQuery(query);
+		// queryObj.setCacheable(true);
 		int result = queryObj.executeUpdate();
 		trn.commit();
 		return result;
@@ -48,18 +57,20 @@ public class EmployeeDAOImpl implements EmployeeDAO, ServletContextListener {
 	@Override
 	public void updateEntity(Object detailsObject) {
 		logger.info("Updating detailsObject: " + detailsObject);
-		Session session = sessionFactory.openSession();
-		Transaction trn = session.beginTransaction();
-		session.update(detailsObject);
+		// Session session = sessionFactory.openSession();
+		Transaction trn = globalSession.beginTransaction();
+		globalSession.update(detailsObject);
 		trn.commit();
-		session.close();
+		// session.close();
 	}
 
 	@Override
 	public <T extends Object> T get(Class<T> classObj, Serializable id) {
 		logger.info("Fetching " + classObj.toGenericString() + " details with identifier id '" + id + "'");
-		Session session = sessionFactory.openSession();
-		return session.get(classObj, id);
+		// Session session = sessionFactory.openSession();
+		T resultEntity = globalSession.get(classObj, id);
+		// session.close();
+		return resultEntity;
 
 	}
 
@@ -69,6 +80,7 @@ public class EmployeeDAOImpl implements EmployeeDAO, ServletContextListener {
 		logger.info("Querying database with SQL Query: " + query);
 		Session session = sessionFactory.openSession();
 		Query<Object> queryObj = session.createQuery(query);
+		// queryObj.setCacheable(true);
 		List<Object> resultList = queryObj.getResultList();
 		if (resultList != null && resultList.size() > 0) {
 			for (Object obj : resultList)
@@ -83,6 +95,7 @@ public class EmployeeDAOImpl implements EmployeeDAO, ServletContextListener {
 		logger.info("Querying database with SQL Query: " + query);
 		Session session = sessionFactory.openSession();
 		Query<Object> queryObj = session.createQuery(query);
+		// queryObj.setCacheable(true);
 		List<Object> resultList = queryObj.getResultList();
 		return resultList;
 	}
@@ -90,9 +103,18 @@ public class EmployeeDAOImpl implements EmployeeDAO, ServletContextListener {
 	@Override
 	public void contextDestroyed(ServletContextEvent event) {
 		logger.info("Releasing resources...");
-		if (sessionFactory != null && sessionFactory.isOpen())
-			sessionFactory.close();
+		try {
+			if (globalSession != null && globalSession.isOpen()) {
+				globalSession.close();
 
+			}
+
+			if (sessionFactory != null && sessionFactory.isOpen())
+				sessionFactory.close();
+		} catch (Exception exc) {
+			logger.error("STATUS CODE: " + StatusCode.INTERNAL_ERROR + ": Exception occured while releasing resources\n"
+					+ exc);
+		}
 		/*
 		 * ClassLoader cl = Thread.currentThread().getContextClassLoader();
 		 *

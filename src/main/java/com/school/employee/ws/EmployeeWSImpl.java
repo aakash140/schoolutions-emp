@@ -95,14 +95,14 @@ public class EmployeeWSImpl implements EmployeeWS {
 
 	@Override
 	public int deactivateEmployee(String employeeID) {
-		String query = "UPDATE Employee EMP SET EMP.status='0' WHERE EMP.empID='" + employeeID + "'";
+		// String query = "UPDATE Employee EMP SET EMP.status='0' WHERE
+		// EMP.empID='" + employeeID + "'";
 		try {
 			if (isEmployee(employeeID)) {
-				int updateResult = dao.update(query);
-				if (updateResult > 0)
-					return StatusCode.OK;
-				else
-					return StatusCode.NOT_FOUND;
+				Employee emp = dao.get(Employee.class, employeeID);
+				emp.setStatus(0);
+				dao.updateEntity(emp);
+				return StatusCode.OK;
 			} else
 				return StatusCode.NOT_FOUND;
 		} catch (Exception exception) {
@@ -136,7 +136,7 @@ public class EmployeeWSImpl implements EmployeeWS {
 			if (credentials != null) {
 				try {
 					if (credentials.getFailedAttempts() != 5
-							&& PasswordUtil.validatePassword(credentials.getPassword(), password)) {
+							&& PasswordUtil.isvalidPassword(credentials.getPassword(), password)) {
 						credentials.setFailedAttempts(0);
 						updateLoginTimestamp(credentials);
 						dao.updateEntity(credentials);
@@ -162,7 +162,7 @@ public class EmployeeWSImpl implements EmployeeWS {
 				return StatusCode.NOT_SIGNED_UP;
 			}
 		} else {
-			logger.error(
+			logger.info(
 					"STATUS CODE: " + StatusCode.NOT_FOUND + "Employee ID " + userID + " does not exist in database.");
 			return StatusCode.NOT_FOUND;
 		}
@@ -201,12 +201,14 @@ public class EmployeeWSImpl implements EmployeeWS {
 
 	@Override
 	public int updatePassword(String userID, char[] oldPassword, char[] newPassword) {
-		String query = "FROM LoginCredentials LC WHERE LC.userID='" + userID + "'";
-		Object obj = dao.getQueryResult(query);
-		LoginCredentials credentials = (LoginCredentials) obj;
+		// String query = "FROM LoginCredentials LC WHERE LC.userID='" + userID
+		// + "'";
+		LoginCredentials credentials = dao.get(LoginCredentials.class, userID);
+		// Object obj = dao.getQueryResult(query);
+		// LoginCredentials credentials = (LoginCredentials) obj;
 		try {
-			if (credentials.getFailedAttempts() != 5
-					&& PasswordUtil.validatePassword(credentials.getPassword(), oldPassword)) {
+			if (credentials != null && credentials.getFailedAttempts() != 5
+					&& PasswordUtil.isvalidPassword(credentials.getPassword(), oldPassword)) {
 				credentials.setPassword(PasswordUtil.encryptPassword(newPassword));
 				dao.updateEntity(credentials);
 				return StatusCode.OK;
@@ -223,6 +225,10 @@ public class EmployeeWSImpl implements EmployeeWS {
 			logger.error("STATUS CODE: " + StatusCode.INTERNAL_ERROR + ":" + exception);
 			return StatusCode.INTERNAL_ERROR;
 		}
+	}
+
+	public Employee[] searchEmployee() {
+		return null;
 	}
 
 	@Override

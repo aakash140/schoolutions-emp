@@ -19,7 +19,7 @@ public class Employee {
 	private Calendar DOJ;
 	private String nameOfFather;
 	private String nameOfMother;
-	private String maritalStatus;
+	private int maritalStatus;
 	private String nameOfSpouse;
 	private String nationalityID;
 	private String PANnumber;
@@ -133,11 +133,11 @@ public class Employee {
 		this.nameOfMother = nameOfMother;
 	}
 
-	public String getMaritalStatus() {
+	public int getMaritalStatus() {
 		return maritalStatus;
 	}
 
-	public void setMaritalStatus(String maritalStatus) {
+	public void setMaritalStatus(int maritalStatus) {
 		this.maritalStatus = maritalStatus;
 	}
 

@@ -15,7 +15,9 @@ public class TestApp {
 	public static void main(String[] args) throws Exception {
 		EmployeeWSImpl empWs = new EmployeeWSImpl();
 
-		empWs.createCredentials("1234", "Pass@123".toCharArray());
+		empWs.updatePassword("1234", "Pass@123".toCharArray(), "Pass@123".toCharArray());
+		empWs.deactivateEmployee("1234");
+		// empWs.isAuthorized("1234", "Pass@123".toCharArray());
 		// addEmp(empWs);
 		// Employee emp = empWs.getEmployee("1234");
 		// System.out.println(emp.getContact().getWhatsAppNumber());
@@ -66,7 +68,7 @@ public class TestApp {
 		emp.setDOJ(doj);
 
 		emp.setDesignation("Principal");
-		emp.setMaritalStatus("Single");
+		emp.setMaritalStatus(1);
 		emp.setExperience(2.5F);
 		emp.setPANnumber("BCGPG6852F");
 		emp.setAddressSet(adrsSet);
