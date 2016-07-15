@@ -15,14 +15,28 @@ public class TestApp {
 	public static void main(String[] args) throws Exception {
 		EmployeeWSImpl empWs = new EmployeeWSImpl();
 
-		empWs.updatePassword("1234", "Pass@123".toCharArray(), "Pass@123".toCharArray());
-		empWs.deactivateEmployee("1234");
+		// empWs.updatePassword("1234", "Pass@123".toCharArray(),
+		// "Pass@123".toCharArray());
+		// empWs.deactivateEmployee("1234");
 		// empWs.isAuthorized("1234", "Pass@123".toCharArray());
 		// addEmp(empWs);
 		// Employee emp = empWs.getEmployee("1234");
 		// System.out.println(emp.getContact().getWhatsAppNumber());
 		// System.out.println(emp.getAddressSet().toArray());
 		// System.out.println(empWs.deactivateEmployee("1234"));
+
+		Calendar dob = Calendar.getInstance();
+		dob.set(1990, 10, 20);
+
+		Calendar doj = Calendar.getInstance();
+		doj.set(2016, 4, 11);
+
+		// Employee[] emps = empWs.searchEmployee("aAK", "guP", "9811569449",
+		// "male", "nent", dob, doj, "ab+", 2, "pal",
+		// 1);
+		long count = empWs.countEmployees("aAK", "guP", "male", "nent", dob, doj, "ab+", 2, "pal", 1);
+		System.out.println(count);
+
 	}
 
 	public static void addEmp(EmployeeWSImpl empWs) {

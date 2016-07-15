@@ -2,6 +2,7 @@ package com.school.employee.ws;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
+import java.util.Calendar;
 
 import javax.activation.DataHandler;
 import javax.jws.WebMethod;
@@ -44,6 +45,25 @@ public interface EmployeeWS {
 	public int updatePassword(@WebParam(partName = "userID") String userID,
 			@WebParam(partName = "oldPassword") char[] oldPassword,
 			@WebParam(partName = "newPassword") char[] newPassword);
+
+	@WebMethod(operationName = "lookupEmployee")
+	@WebResult(partName = "EmployeeArray")
+	public Employee[] searchEmployee(@WebParam(partName = "firstName") String fName,
+			@WebParam(partName = "lastName") String lName, @WebParam(partName = "contactNumber") String contactNum,
+			@WebParam(partName = "gender") String gender, @WebParam(partName = "employeeType") String employeeType,
+			@WebParam(partName = "DOB") Calendar dob, @WebParam(partName = "DOJ") Calendar doj,
+			@WebParam(partName = "bloodGroup") String bloodgroup, @WebParam(partName = "departmentID") int department,
+			@WebParam(partName = "designation") String designation,
+			@WebParam(partName = "maritalStatus") int maritalStatus);
+
+	@WebMethod(operationName = "countEmployees")
+	@WebResult(partName = "ResultCount")
+	public long countEmployees(@WebParam(partName = "firstName") String fName,
+			@WebParam(partName = "lastName") String lName, @WebParam(partName = "gender") String gender,
+			@WebParam(partName = "employeeType") String employeeType, @WebParam(partName = "DOB") Calendar dob,
+			@WebParam(partName = "DOJ") Calendar doj, @WebParam(partName = "bloodGroup") String bloodgroup,
+			@WebParam(partName = "departmentID") int department, @WebParam(partName = "designation") String designation,
+			@WebParam(partName = "maritalStatus") int maritalStatus);
 
 	@WebMethod(operationName = "downloadFile")
 	@WebResult(partName = "ByteArray")

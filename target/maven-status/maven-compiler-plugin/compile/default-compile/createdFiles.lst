@@ -1,6 +1,7 @@
 com\school\employee\bean\LoginCredentials.class
 com\school\employee\bean\Address.class
 com\school\employee\dao\EmployeeDAOImpl.class
+com\school\util\DepartmentList.class
 com\school\util\DocumentProp.class
 com\school\util\FileIOUtil.class
 com\school\employee\dao\EmployeeDAO.class

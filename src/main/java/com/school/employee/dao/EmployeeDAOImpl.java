@@ -8,6 +8,7 @@ import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
 
 import org.apache.log4j.Logger;
+import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -98,6 +99,19 @@ public class EmployeeDAOImpl implements EmployeeDAO, ServletContextListener {
 		// queryObj.setCacheable(true);
 		List<Object> resultList = queryObj.getResultList();
 		return resultList;
+	}
+
+	@SuppressWarnings("deprecation")
+	@Override
+	public <T extends Object> Criteria getCriteria(Class<T> entity, String alias) {
+		Criteria criteria = globalSession.createCriteria(entity, alias);
+		return criteria;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<Object> getSearchResult(Criteria criteria) {
+		return criteria.list();
 	}
 
 	@Override

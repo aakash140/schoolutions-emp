@@ -4,12 +4,19 @@ import java.io.File;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.time.LocalDateTime;
+import java.util.Calendar;
 import java.util.List;
 
 import javax.activation.DataHandler;
 import javax.jws.WebService;
 
 import org.apache.log4j.Logger;
+import org.hibernate.Criteria;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Disjunction;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.xml.XmlBeanFactory;
 import org.springframework.core.io.ClassPathResource;
@@ -227,8 +234,122 @@ public class EmployeeWSImpl implements EmployeeWS {
 		}
 	}
 
-	public Employee[] searchEmployee() {
+	@Override
+	public Employee[] searchEmployee(String fName, String lName, String contactNum, String gender, String employeeType,
+			Calendar dob, Calendar doj, String bloodgroup, int department, String designation, int maritalStatus) {
+
+		Criteria criteria = dao.getCriteria(Employee.class, "EMP");
+
+		if (fName != null && fName.length() > 0)
+			criteria.add(Restrictions.ilike("EMP.firstName", "%" + fName + "%"));
+
+		if (lName != null && lName.length() > 0)
+			criteria.add(Restrictions.ilike("EMP.lastName", "%" + lName + "%"));
+
+		if (contactNum != null && contactNum.length() > 0) {
+			criteria.createAlias("EMP.contact", "CNTCT");
+			Criterion mob1 = Restrictions.eq("CNTCT.mobileNumber1", contactNum);
+			Criterion mob2 = Restrictions.eq("CNTCT.mobileNumber2", contactNum);
+			Criterion whatsApp = Restrictions.eq("CNTCT.whatsAppNumber", contactNum);
+			Disjunction expr = Restrictions.or(mob1, mob2, whatsApp);
+			criteria.add(expr);
+		}
+
+		if (gender != null && gender.length() > 0)
+			criteria.add(Restrictions.eq("EMP.gender", gender).ignoreCase());
+
+		if (employeeType != null && employeeType.length() > 0)
+			criteria.add(Restrictions.ilike("EMP.employeeType", "%" + employeeType + "%"));
+
+		if (dob != null)
+			criteria.add(Restrictions.ge("EMP.DOB", dob));
+
+		if (doj != null)
+			criteria.add(Restrictions.ge("EMP.DOJ", doj));
+
+		if (bloodgroup != null && bloodgroup.length() > 0)
+			criteria.add(Restrictions.eq("EMP.bloodGroup", bloodgroup).ignoreCase());
+
+		if (department >= 0)
+			criteria.add(Restrictions.eq("EMP.department", department));
+
+		if (designation != null && designation.length() > 0)
+			criteria.add(Restrictions.ilike("EMP.designation", "%" + designation + "%"));
+
+		if (maritalStatus >= 0)
+			criteria.add(Restrictions.eq("EMP.maritalStatus", maritalStatus));
+
+		criteria.addOrder(Order.asc("EMP.empID"));
+
+		try {
+			List<Object> list = dao.getSearchResult(criteria);
+
+			if (list != null && list.size() > 0) {
+				Object[] obj = list.toArray();
+				Employee[] employees = new Employee[list.size()];
+
+				for (int i = 0; i < obj.length; i++)
+					employees[i] = (Employee) obj[i];
+				return employees;
+			}
+		} catch (Exception exception) {
+			logger.error("STATUS CODE: " + StatusCode.DBEERROR + ": An exception occured during employee lookup. "
+					+ exception);
+			return null;
+		}
 		return null;
+	}
+
+	@Override
+	public long countEmployees(String fName, String lName, String gender, String employeeType, Calendar dob,
+			Calendar doj, String bloodgroup, int department, String designation, int maritalStatus) {
+		Criteria criteria = dao.getCriteria(Employee.class, "EMP");
+
+		if (fName != null && fName.length() > 0)
+			criteria.add(Restrictions.ilike("EMP.firstName", "%" + fName + "%"));
+
+		if (lName != null && lName.length() > 0)
+			criteria.add(Restrictions.ilike("EMP.lastName", "%" + lName + "%"));
+
+		if (gender != null && gender.length() > 0)
+			criteria.add(Restrictions.eq("EMP.gender", gender).ignoreCase());
+
+		if (employeeType != null && employeeType.length() > 0)
+			criteria.add(Restrictions.ilike("EMP.employeeType", "%" + employeeType + "%"));
+
+		if (dob != null)
+			criteria.add(Restrictions.ge("EMP.DOB", dob));
+
+		if (doj != null)
+			criteria.add(Restrictions.ge("EMP.DOJ", doj));
+
+		if (bloodgroup != null && bloodgroup.length() > 0)
+			criteria.add(Restrictions.eq("EMP.bloodGroup", bloodgroup).ignoreCase());
+
+		if (department >= 0)
+			criteria.add(Restrictions.eq("EMP.department", department));
+
+		if (designation != null && designation.length() > 0)
+			criteria.add(Restrictions.ilike("EMP.designation", "%" + designation + "%"));
+
+		if (maritalStatus >= 0)
+			criteria.add(Restrictions.eq("EMP.maritalStatus", maritalStatus));
+
+		criteria.setProjection(Projections.rowCount());
+
+		try {
+			List<Object> list = dao.getSearchResult(criteria);
+
+			if (list.size() > 0) {
+				Long recordsNum = (Long) list.get(0);
+				return recordsNum;
+			}
+		} catch (Exception exception) {
+			logger.error("STATUS CODE: " + StatusCode.DBEERROR + ": An exception occured during employee lookup. "
+					+ exception);
+			return 0L;
+		}
+		return 0L;
 	}
 
 	@Override
