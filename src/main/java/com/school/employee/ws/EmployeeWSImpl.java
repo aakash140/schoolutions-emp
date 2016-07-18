@@ -279,6 +279,8 @@ public class EmployeeWSImpl implements EmployeeWS {
 		if (maritalStatus >= 0)
 			criteria.add(Restrictions.eq("EMP.maritalStatus", maritalStatus));
 
+		criteria.add(Restrictions.eq("EMP.status", "1"));
+
 		criteria.addOrder(Order.asc("EMP.empID"));
 
 		try {
@@ -334,6 +336,8 @@ public class EmployeeWSImpl implements EmployeeWS {
 
 		if (maritalStatus >= 0)
 			criteria.add(Restrictions.eq("EMP.maritalStatus", maritalStatus));
+
+		criteria.add(Restrictions.eq("EMP.status", 1));
 
 		criteria.setProjection(Projections.rowCount());
 
