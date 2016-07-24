@@ -432,6 +432,12 @@ public class EmployeeWSImpl implements EmployeeWS {
 		return null;
 	}
 
+	@Override
+	public int saveAndEmailOTP(String employeeID, int OTP) {
+
+		return 0;
+	}
+
 	private boolean isEmployee(String userID) {
 		String query = "SELECT EMP.empID FROM Employee EMP WHERE EMP.empID='" + userID + "' AND EMP.status='1'";
 		Object obj = dao.getQueryResult(query);

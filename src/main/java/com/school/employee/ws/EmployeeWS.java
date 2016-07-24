@@ -85,4 +85,9 @@ public interface EmployeeWS {
 	@WebMethod
 	@WebResult(partName = "DocRecordsArray")
 	public DocumentRecords[] getFileNames(@WebParam(partName = "DocOwnerID") String ownerID);
+
+	@WebMethod
+	@WebResult(partName = "ResultCode")
+	public int saveAndEmailOTP(@WebParam(partName = "EmployeeID") String employeeID,
+			@WebParam(partName = "OTP") int OTP);
 }

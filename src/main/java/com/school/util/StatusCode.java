@@ -12,4 +12,5 @@ public interface StatusCode {
 	int DUPLICATE = 444;
 	int INTERNAL_ERROR = 500;
 	int DBEERROR = 555;
+	int EMAILERROR = 556;
 }
