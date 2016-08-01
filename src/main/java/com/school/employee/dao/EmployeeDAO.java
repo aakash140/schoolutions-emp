@@ -11,7 +11,9 @@ public interface EmployeeDAO {
 
 	public int update(String query);
 
-	public void updateEntity(Object detailsObject);
+	public void saveOrUpdate(Object entity);
+
+	public void updateEntity(Object entity);
 
 	public <T extends Object> T get(Class<T> classObj, Serializable id);
 

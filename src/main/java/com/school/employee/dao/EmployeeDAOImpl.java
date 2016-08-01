@@ -33,11 +33,21 @@ public class EmployeeDAOImpl implements EmployeeDAO, ServletContextListener {
 	}
 
 	@Override
-	public void save(Object detailsObject) {
-		logger.info("Saving detailsObject: " + detailsObject);
+	public void save(Object entity) {
+		logger.info("Saving detailsObject: " + entity);
 		Session session = sessionFactory.openSession();
 		Transaction trn = session.beginTransaction();
-		session.persist(detailsObject);
+		session.persist(entity);
+		trn.commit();
+		session.close();
+	}
+
+	@Override
+	public void saveOrUpdate(Object entity) {
+		logger.info("Saving detailsObject: " + entity);
+		Session session = sessionFactory.openSession();
+		Transaction trn = session.beginTransaction();
+		session.saveOrUpdate(entity);
 		trn.commit();
 		session.close();
 	}

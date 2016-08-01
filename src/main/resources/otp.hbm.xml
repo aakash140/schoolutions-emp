@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC 
+ "-//Hibernate/Hibernate Mapping DTD//EN"
+ "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+ 
+ <hibernate-mapping>
+ 	<class name="com.school.employee.bean.UserOTP" table ="USER_OTP">
+ 		<meta attribute="class-description">
+ 			OTP POJO
+ 		</meta>
+ 		<id				name="userID"		column="EMP_ID"></id>
+ 		<timestamp 		name="version"      column="RCRD_VER" source="db"></timestamp>
+ 		
+ 		<property  		name="OTP"			column="OTP"></property>
+ 		<property 		name="activeStatus"		column="ACTV_STATUS"></property>
+ 		<property		name="OTPTimestamp" column="OTP_TMSTMP"></property>
+ 	</class>
+ </hibernate-mapping>

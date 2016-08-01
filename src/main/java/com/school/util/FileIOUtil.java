@@ -32,9 +32,14 @@ public class FileIOUtil {
 	static {
 		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
 		try (InputStream input = classLoader.getResourceAsStream("docProp.properties");) {
-			prop.load(input);
+			if (input != null)
+				prop.load(input);
+			else
+				logger.error("STATUS CODE: " + StatusCode.INTERNAL_ERROR
+						+ " .Exception occured while loading docProp.properties file.Using default values.");
 		} catch (IOException exception) {
-			exception.printStackTrace();
+			logger.error("STATUS CODE: " + StatusCode.INTERNAL_ERROR
+					+ " .Exception occured while loading docProp.properties file.\n" + exception);
 		}
 	}
 
@@ -52,8 +57,9 @@ public class FileIOUtil {
 		return dataHandler;
 	}
 
-	public File saveFile(DataHandler dh, String ownerID, int ownerType, int fileType, String fileName) {
+	public File saveFile(DataHandler dh, String ownerID, int ownerType, int fileType) {
 		String fileDest = "";
+		String fileName = dh.getName();
 		fileDest = configureDestination(fileType, fileName, ownerID, ownerType);
 		try {
 			File file = new File(fileDest);

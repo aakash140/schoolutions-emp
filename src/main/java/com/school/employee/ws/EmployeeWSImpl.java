@@ -4,10 +4,12 @@ import java.io.File;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Calendar;
 import java.util.List;
 
 import javax.activation.DataHandler;
+import javax.activation.FileDataSource;
 import javax.jws.WebService;
 
 import org.apache.log4j.Logger;
@@ -25,7 +27,9 @@ import org.springframework.core.io.Resource;
 import com.school.employee.bean.DocumentRecords;
 import com.school.employee.bean.Employee;
 import com.school.employee.bean.LoginCredentials;
+import com.school.employee.bean.UserOTP;
 import com.school.employee.dao.EmployeeDAO;
+import com.school.util.EmailUtil;
 import com.school.util.FileIOUtil;
 import com.school.util.PasswordUtil;
 import com.school.util.StatusCode;
@@ -44,19 +48,6 @@ public class EmployeeWSImpl implements EmployeeWS {
 		factory = new XmlBeanFactory(resource);
 		dao = (EmployeeDAO) factory.getBean("employeeDAO");
 	}
-
-	/*
-	 * @Override public Employee getEmployee(String employeeID) {
-	 * logger.info("Getting details for Employee ID: " + employeeID); String
-	 * query = "FROM Employee EMP WHERE EMP.empID='" + employeeID + "'"; try {
-	 * Object obj = dao.getQueryResult(query); if (obj == null) {
-	 * logger.info("Employee with Employee ID: " + employeeID +
-	 * " does not exist in records."); } return (Employee) obj; } catch
-	 * (Exception exception) { logger.error("STATUS CODE: " +
-	 * StatusCode.DBEERROR +
-	 * ":Exception occured while fetching details for Employee ID: " +
-	 * employeeID + ":" + exception); return null; } }
-	 */
 
 	@Override
 	public Employee getEmployee(String employeeID) {
@@ -102,8 +93,6 @@ public class EmployeeWSImpl implements EmployeeWS {
 
 	@Override
 	public int deactivateEmployee(String employeeID) {
-		// String query = "UPDATE Employee EMP SET EMP.status='0' WHERE
-		// EMP.empID='" + employeeID + "'";
 		try {
 			if (isEmployee(employeeID)) {
 				Employee emp = dao.get(Employee.class, employeeID);
@@ -137,8 +126,6 @@ public class EmployeeWSImpl implements EmployeeWS {
 	public int isAuthorized(String userID, char[] password) {
 		logger.info("Verifying credentials for User ID:" + userID);
 		if (isEmployee(userID)) {
-			// String query = "FROM LoginCredentials LC WHERE LC.userID='" +
-			// userID + "'";
 			LoginCredentials credentials = dao.get(LoginCredentials.class, userID);
 			if (credentials != null) {
 				try {
@@ -189,7 +176,7 @@ public class EmployeeWSImpl implements EmployeeWS {
 					logger.info("STATUS CODE: " + StatusCode.CREATED + ": Credentials for Employee ID " + userID
 							+ " have been successfully created");
 					return StatusCode.CREATED;
-				} catch (NoSuchAlgorithmException | InvalidKeySpecException exception) {
+				} catch (Exception exception) {
 					logger.error("STATUS CODE: " + StatusCode.INTERNAL_ERROR + ": " + exception);
 					return StatusCode.INTERNAL_ERROR;
 				}
@@ -208,20 +195,17 @@ public class EmployeeWSImpl implements EmployeeWS {
 
 	@Override
 	public int updatePassword(String userID, char[] oldPassword, char[] newPassword) {
-		// String query = "FROM LoginCredentials LC WHERE LC.userID='" + userID
-		// + "'";
 		LoginCredentials credentials = dao.get(LoginCredentials.class, userID);
-		// Object obj = dao.getQueryResult(query);
-		// LoginCredentials credentials = (LoginCredentials) obj;
+
 		try {
-			if (credentials != null && credentials.getFailedAttempts() != 5
-					&& PasswordUtil.isvalidPassword(credentials.getPassword(), oldPassword)) {
+			boolean isValidOldPass = PasswordUtil.isvalidPassword(credentials.getPassword(), oldPassword);
+			if (credentials != null && credentials.getFailedAttempts() != 5 && isValidOldPass) {
 				credentials.setPassword(PasswordUtil.encryptPassword(newPassword));
 				dao.updateEntity(credentials);
 				return StatusCode.OK;
-			} else if (credentials.getFailedAttempts() == 5) {
-				logger.error("STATUS CODE: " + StatusCode.LOCKED_OUT + ": Employee ID " + userID
-						+ " has been locked out due to 5 consequent incorrect login attempts");
+			} else if (credentials != null && credentials.getFailedAttempts() == 5) {
+				logger.info("STATUS CODE: " + StatusCode.LOCKED_OUT
+						+ ": Could not update the password for locked out Employee ID '" + userID + "'");
 				return StatusCode.LOCKED_OUT;
 			} else {
 				logger.error("STATUS CODE: " + StatusCode.FORBIDDEN
@@ -232,6 +216,45 @@ public class EmployeeWSImpl implements EmployeeWS {
 			logger.error("STATUS CODE: " + StatusCode.INTERNAL_ERROR + ":" + exception);
 			return StatusCode.INTERNAL_ERROR;
 		}
+	}
+
+	// This method assumes that an OTP is already available in database for
+	// given userID.
+	@Override
+	public int updatePassword(String userID, String submittedOTP, char[] newPassword) {
+		if (isAlreadySignedUp(userID)) {
+			UserOTP usrOTP = dao.get(UserOTP.class, userID);
+			if (usrOTP != null) {
+				LoginCredentials credentials = dao.get(LoginCredentials.class, userID);
+				String savedOTP = usrOTP.getOTP();
+				LocalDateTime generationTime = usrOTP.getOTPTimestamp();
+				LocalDateTime now = LocalDateTime.now();
+				long minutesElapsed = ChronoUnit.MINUTES.between(generationTime, now);
+
+				if (savedOTP.equalsIgnoreCase(submittedOTP)) {
+					if (minutesElapsed <= 15) {
+						try {
+							credentials.setPassword(PasswordUtil.encryptPassword(newPassword));
+							dao.updateEntity(credentials);
+							deactivateOTP(usrOTP);
+							return StatusCode.OK;
+						} catch (Exception exception) {
+							logger.error("STATUS CODE: " + StatusCode.INTERNAL_ERROR
+									+ ": Error occured while updating password for user id '" + userID + "'\n"
+									+ exception);
+							return StatusCode.INTERNAL_ERROR;
+						}
+					} else {
+						deactivateOTP(usrOTP);
+						return StatusCode.FORBIDDEN;
+					}
+				} else
+					return StatusCode.FORBIDDEN;
+
+			} else
+				return StatusCode.INTERNAL_ERROR;
+		} else
+			return StatusCode.NOT_FOUND;
 	}
 
 	@Override
@@ -349,7 +372,7 @@ public class EmployeeWSImpl implements EmployeeWS {
 				return recordsNum;
 			}
 		} catch (Exception exception) {
-			logger.error("STATUS CODE: " + StatusCode.DBEERROR + ": An exception occured during employee lookup. "
+			logger.error("STATUS CODE: " + StatusCode.DBEERROR + ": An exception occured during employee lookup.\n "
 					+ exception);
 			return 0L;
 		}
@@ -372,10 +395,10 @@ public class EmployeeWSImpl implements EmployeeWS {
 	}
 
 	@Override
-	public int saveFile(DataHandler dh, String ownerID, int ownerType, int fileType, String fileName) {
+	public int saveFile(DataHandler dh, String ownerID, int ownerType, int fileType) {
 		logger.info("Saving file with File Type '" + fileType + "' for owner '" + ownerID + "'");
 		FileIOUtil fileUtil = new FileIOUtil();
-		File savedFile = fileUtil.saveFile(dh, ownerID, ownerType, fileType, fileName);
+		File savedFile = fileUtil.saveFile(dh, ownerID, ownerType, fileType);
 		if (savedFile != null && savedFile.exists()) {
 			try {
 				DocumentRecords dr = (DocumentRecords) factory.getBean("docRecordsPOJO");
@@ -386,7 +409,7 @@ public class EmployeeWSImpl implements EmployeeWS {
 				return StatusCode.CREATED;
 			} catch (Exception exception) {
 				logger.error("STATUS CODE: " + StatusCode.DBEERROR + " :Error occured while saving doc/file '"
-						+ fileName + "' for ownerID '" + ownerID + "' records in database\n" + exception);
+						+ dh.getName() + "' for ownerID '" + ownerID + "' records in database\n" + exception);
 				return StatusCode.DBEERROR;
 			}
 		} else
@@ -394,10 +417,10 @@ public class EmployeeWSImpl implements EmployeeWS {
 	}
 
 	@Override
-	public int updateFile(DataHandler dh, String ownerID, int ownerType, int fileType, String fileName) {
+	public int updateFile(DataHandler dh, String ownerID, int ownerType, int fileType) {
 		logger.info("Updating file with File Type '" + fileType + "' for owner '" + ownerID + "'");
 		FileIOUtil fileUtil = new FileIOUtil();
-		File savedFile = fileUtil.saveFile(dh, ownerID, ownerType, fileType, fileName);
+		File savedFile = fileUtil.saveFile(dh, ownerID, ownerType, fileType);
 		if (savedFile != null && savedFile.exists()) {
 			try {
 				DocumentRecords dr = (DocumentRecords) factory.getBean("docRecordsPOJO");
@@ -408,7 +431,7 @@ public class EmployeeWSImpl implements EmployeeWS {
 				return StatusCode.CREATED;
 			} catch (Exception exception) {
 				logger.error("STATUS CODE: " + StatusCode.DBEERROR + " :Error occured while updating doc/file '"
-						+ fileName + "' records in database\n" + exception);
+						+ dh.getName() + "' records in database\n" + exception);
 				return StatusCode.DBEERROR;
 			}
 		} else
@@ -433,9 +456,63 @@ public class EmployeeWSImpl implements EmployeeWS {
 	}
 
 	@Override
-	public int saveAndEmailOTP(String employeeID, int OTP) {
+	public int sendAnEmail(String employeeID, String messageBody, String subject, DataHandler[] attachments) {
+		Criteria criteria = dao.getCriteria(Employee.class, "EMP");
+		criteria.add(Restrictions.eq("EMP.empID", employeeID));
+		criteria.createAlias("EMP.contact", "CNTCT");
+		criteria.setProjection(Projections.property("CNTCT.email"));
+		try {
+			List<Object> result = dao.getSearchResult(criteria);
+			if (result != null && result.size() > 0) {
+				String recepient = (String) result.get(0);
+				EmailUtil emailUtil = new EmailUtil();
+				int status = emailUtil.sendEmail(recepient, messageBody, subject, attachments);
+				return status;
+			} else {
+				return StatusCode.EMAIL_NOT_FOUND;
+			}
 
-		return 0;
+		} catch (Exception exp) {
+			exp.printStackTrace();
+			return StatusCode.DBEERROR;
+		}
+	}
+
+	@Override
+	public int emailandSaveOTP(String employeeID, String OTP) {
+		if (isAlreadySignedUp(employeeID)) {
+			Criteria criteria = dao.getCriteria(Employee.class, "EMP");
+			criteria.add(Restrictions.eq("EMP.empID", employeeID));
+			criteria.createAlias("EMP.contact", "CNTCT");
+			criteria.setProjection(Projections.property("CNTCT.email"));
+			try {
+				List<Object> result = dao.getSearchResult(criteria);
+				if (result != null && result.size() > 0) {
+					String recepient = (String) result.get(0);
+					EmailUtil emailUtil = new EmailUtil();
+					int status = emailUtil.emailOTP(recepient, OTP);
+
+					if (status == StatusCode.OK) {
+						UserOTP usrOTP = dao.get(UserOTP.class, employeeID);
+						if (usrOTP == null)
+							usrOTP = (UserOTP) factory.getBean("userOTPPOJO");
+						usrOTP.setUserID(employeeID);
+						usrOTP.setOTP(OTP);
+						usrOTP.setOTPTimestamp(LocalDateTime.now());
+						dao.saveOrUpdate(usrOTP);
+						return StatusCode.OK;
+					} else
+						return StatusCode.EMAILERROR;
+				} else
+					return StatusCode.EMAIL_NOT_FOUND;
+			} catch (Exception exception) {
+				logger.error("STATUS CODE: " + StatusCode.DBEERROR
+						+ ". Exception occured while saving OTP for employee '" + employeeID + "'.\n" + exception);
+				return StatusCode.DBEERROR;
+			}
+
+		} else
+			return StatusCode.NOT_FOUND;
 	}
 
 	private boolean isEmployee(String userID) {
@@ -466,4 +543,29 @@ public class EmployeeWSImpl implements EmployeeWS {
 		credentials.setLastLoginTimestamp(now);
 	}
 
+	private void deactivateOTP(UserOTP usrOTP) {
+		usrOTP.setActiveStatus(0);
+		try {
+			dao.updateEntity(usrOTP);
+		} catch (Exception exception) {
+			logger.error("STATUS CODE: " + StatusCode.DBEERROR + ": Error occured while deactivating OTP for user ID '"
+					+ usrOTP.getUserID() + "'.\n" + exception);
+		}
+	}
+
+	public static void main(String[] args) {
+		File f1 = new File("C:\\Users\\Home\\Desktop\\1.jpg");
+		File f2 = new File("C:\\Users\\Home\\Desktop\\CREATE_TABLE.sql");
+		File f3 = new File("C:\\Users\\Home\\Desktop\\possuite-141-dm-ddl.rar");
+
+		DataHandler dh1 = new DataHandler(new FileDataSource(f1));
+		DataHandler dh2 = new DataHandler(new FileDataSource(f2));
+		DataHandler dh3 = new DataHandler(new FileDataSource(f3));
+
+		DataHandler[] dh = new DataHandler[] { dh1, dh2, dh3 };
+		// String[] recepientList = new String[] { "aakash.gupta140@gmail.com",
+		// "aakash.gupta140@outlook.com",
+		// "vikas.gupta0502@outlook.com", "pkgn1965@gmail.com" };
+		new EmployeeWSImpl().sendAnEmail("1234", "Test", "Test", dh);
+	}
 }

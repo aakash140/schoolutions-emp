@@ -22,7 +22,7 @@ public interface EmployeeWS {
 	@WebResult(partName = "ResultCode")
 	public int saveEmployee(@WebParam(partName = "employeeDetailsObject") Employee employee);
 
-	@WebMethod(operationName = "updateEmployee")
+	@WebMethod(operationName = "updateEmployeeDetails")
 	@WebResult(partName = "ResultCode")
 	public int updateEmployee(@WebParam(partName = "employeeDetailsObject") Employee employee);
 
@@ -40,6 +40,10 @@ public interface EmployeeWS {
 	@WebResult(partName = "ResultCode")
 	public int createCredentials(@WebParam(partName = "userID") String userID,
 			@WebParam(partName = "loginPassword") char[] password);
+
+	@WebResult(partName = "ResultCode")
+	public int updatePassword(@WebParam(partName = "userID") String userID, @WebParam(partName = "OTP") String OTP,
+			@WebParam(partName = "newPassword") char[] newPassword);
 
 	@WebResult(partName = "ResultCode")
 	public int updatePassword(@WebParam(partName = "userID") String userID,
@@ -74,20 +78,23 @@ public interface EmployeeWS {
 	@WebResult(partName = "UploadStatus")
 	public int saveFile(@WebParam(partName = "ByteArray") DataHandler dh,
 			@WebParam(partName = "FileOwnerID") String ownerID, @WebParam(partName = "FileOwnerType") int ownerType,
-			@WebParam(partName = "FileType") int fileType, @WebParam(partName = "FileName") String fileName);
+			@WebParam(partName = "FileType") int fileType);
 
 	@WebMethod(operationName = "updateFile")
 	@WebResult(partName = "UploadStatus")
 	public int updateFile(@WebParam(partName = "ByteArray") DataHandler dh,
 			@WebParam(partName = "FileOwnerID") String ownerID, @WebParam(partName = "FileOwnerType") int ownerType,
-			@WebParam(partName = "FileType") int fileType, @WebParam(partName = "FileName") String fileName);
+			@WebParam(partName = "FileType") int fileType);
 
-	@WebMethod
 	@WebResult(partName = "DocRecordsArray")
 	public DocumentRecords[] getFileNames(@WebParam(partName = "DocOwnerID") String ownerID);
 
-	@WebMethod
 	@WebResult(partName = "ResultCode")
-	public int saveAndEmailOTP(@WebParam(partName = "EmployeeID") String employeeID,
-			@WebParam(partName = "OTP") int OTP);
+	public int emailandSaveOTP(@WebParam(partName = "EmployeeID") String employeeID,
+			@WebParam(partName = "OTP") String OTP);
+
+	@WebResult(partName = "ResultCode")
+	public int sendAnEmail(@WebParam(partName = "EmployeeID") String employeeID,
+			@WebParam(partName = "MessageBody") String messageBody, @WebParam(partName = "Subject") String subject,
+			@WebParam(partName = "MimeAttachments") DataHandler[] attachments);
 }
