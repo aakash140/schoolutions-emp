@@ -96,7 +96,7 @@ public class PasswordUtil {
 		return bytes;
 	}
 
-	public static void maskPassword(char[] password) {
+	private static void maskPassword(char[] password) {
 		logger.info("Masking the entered password");
 		for (int i = 0; i < password.length; i++)
 			password[i] = '#';

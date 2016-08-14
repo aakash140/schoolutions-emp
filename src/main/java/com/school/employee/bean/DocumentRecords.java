@@ -18,6 +18,15 @@ public class DocumentRecords implements Serializable {
 	private String docLocation;
 	private Date version;
 
+	public DocumentRecords() {
+
+	}
+
+	public DocumentRecords(String ownerID, int docType) {
+		this.ownerID = ownerID;
+		this.docType = docType;
+	}
+
 	public String getOwnerID() {
 		return ownerID;
 	}

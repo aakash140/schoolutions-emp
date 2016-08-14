@@ -6,7 +6,9 @@ import java.security.spec.InvalidKeySpecException;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.activation.DataHandler;
 import javax.activation.FileDataSource;
@@ -29,6 +31,7 @@ import com.school.employee.bean.Employee;
 import com.school.employee.bean.LoginCredentials;
 import com.school.employee.bean.UserOTP;
 import com.school.employee.dao.EmployeeDAO;
+import com.school.util.DocumentProp;
 import com.school.util.EmailUtil;
 import com.school.util.FileIOUtil;
 import com.school.util.PasswordUtil;
@@ -230,8 +233,9 @@ public class EmployeeWSImpl implements EmployeeWS {
 				LocalDateTime generationTime = usrOTP.getOTPTimestamp();
 				LocalDateTime now = LocalDateTime.now();
 				long minutesElapsed = ChronoUnit.MINUTES.between(generationTime, now);
+				boolean isOTPActive = usrOTP.getActiveStatus() == 1 ? true : false;
 
-				if (savedOTP.equalsIgnoreCase(submittedOTP)) {
+				if (savedOTP.equalsIgnoreCase(submittedOTP) && isOTPActive) {
 					if (minutesElapsed <= 15) {
 						try {
 							credentials.setPassword(PasswordUtil.encryptPassword(newPassword));
@@ -250,7 +254,6 @@ public class EmployeeWSImpl implements EmployeeWS {
 					}
 				} else
 					return StatusCode.FORBIDDEN;
-
 			} else
 				return StatusCode.INTERNAL_ERROR;
 		} else
@@ -264,10 +267,10 @@ public class EmployeeWSImpl implements EmployeeWS {
 		Criteria criteria = dao.getCriteria(Employee.class, "EMP");
 
 		if (fName != null && fName.length() > 0)
-			criteria.add(Restrictions.ilike("EMP.firstName", "%" + fName + "%"));
+			criteria.add(Restrictions.ilike("EMP.firstName", fName + "%"));
 
 		if (lName != null && lName.length() > 0)
-			criteria.add(Restrictions.ilike("EMP.lastName", "%" + lName + "%"));
+			criteria.add(Restrictions.ilike("EMP.lastName", lName + "%"));
 
 		if (contactNum != null && contactNum.length() > 0) {
 			criteria.createAlias("EMP.contact", "CNTCT");
@@ -331,10 +334,10 @@ public class EmployeeWSImpl implements EmployeeWS {
 		Criteria criteria = dao.getCriteria(Employee.class, "EMP");
 
 		if (fName != null && fName.length() > 0)
-			criteria.add(Restrictions.ilike("EMP.firstName", "%" + fName + "%"));
+			criteria.add(Restrictions.ilike("EMP.firstName", fName + "%"));
 
 		if (lName != null && lName.length() > 0)
-			criteria.add(Restrictions.ilike("EMP.lastName", "%" + lName + "%"));
+			criteria.add(Restrictions.ilike("EMP.lastName", lName + "%"));
 
 		if (gender != null && gender.length() > 0)
 			criteria.add(Restrictions.eq("EMP.gender", gender).ignoreCase());
@@ -382,15 +385,15 @@ public class EmployeeWSImpl implements EmployeeWS {
 	@Override
 	public DataHandler getFile(String ownerID, int fileType) {
 		logger.info("Getting file with File Type '" + fileType + "' for owner '" + ownerID + "'");
-		String query = "SELECT DR.docLocation FROM DocumentRecords DR WHERE DR.docType='" + fileType + "'";
-		Object result = dao.getQueryResult(query);
+
+		DocumentRecords docRec = dao.get(DocumentRecords.class, new DocumentRecords(ownerID, fileType));
 		DataHandler dh = null;
-		if (result != null) {
-			String fileLoc = (String) result;
+		if (docRec != null) {
+			String fileLoc = docRec.getDocLocation();
 			FileIOUtil fileUtil = new FileIOUtil();
 			dh = fileUtil.getFile(fileLoc);
-		}
-		logger.info("File with File Type '" + fileType + "' for owner '" + ownerID + "' does not exist.");
+		} else
+			logger.info("File with file Type '" + fileType + "' for owner '" + ownerID + "' does not exist.");
 		return dh;
 	}
 
@@ -441,8 +444,10 @@ public class EmployeeWSImpl implements EmployeeWS {
 
 	@Override
 	public DocumentRecords[] getFileNames(String ownerID) {
-		String query = "FROM DocumentRecords DR where DR.ownerID='" + ownerID + "'";
-		List<Object> resultList = dao.getQueryResults(query);
+		String query = "FROM DocumentRecords DR where DR.ownerID=  :ownerID ";
+		Map<String, String> paramMap = new HashMap<>();
+		paramMap.put("ownerID", ownerID);
+		List<Object> resultList = dao.getQueryResults(query, paramMap.entrySet());
 		if (resultList != null) {
 			DocumentRecords[] docArray = new DocumentRecords[resultList.size()];
 			Object objArray[] = resultList.toArray();
@@ -566,6 +571,7 @@ public class EmployeeWSImpl implements EmployeeWS {
 		// String[] recepientList = new String[] { "aakash.gupta140@gmail.com",
 		// "aakash.gupta140@outlook.com",
 		// "vikas.gupta0502@outlook.com", "pkgn1965@gmail.com" };
-		new EmployeeWSImpl().sendAnEmail("1234", "Test", "Test", dh);
+		// new EmployeeWSImpl().sendAnEmail("1234", "Test", "Test", dh);
+		new EmployeeWSImpl().getFile("1234", DocumentProp.DP);
 	}
 }
