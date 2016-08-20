@@ -3,7 +3,6 @@ package com.school.employee.dao;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -89,30 +88,31 @@ public class EmployeeDAOImpl implements EmployeeDAO, ServletContextListener {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public Object getQueryResult(String query) {
+	public Object getQueryResult(String query, Map<String, Object> valueMap) {
 		logger.info("Querying database with SQL Query: " + query);
 		Session session = sessionFactory.openSession();
 		Query<Object> queryObj = session.createQuery(query);
 		// queryObj.setCacheable(true);
+
+		valueMap.forEach((k, v) -> queryObj.setParameter(k, v));
+
 		List<Object> resultList = queryObj.getResultList();
 		if (resultList != null && resultList.size() > 0) {
-			for (Object obj : resultList)
-				return obj;
+			return resultList.get(0);
 		}
 		return null;
 	}
 
-	@SuppressWarnings({ "unchecked", "deprecation" })
+	@SuppressWarnings("unchecked")
 	@Override
-	public List<Object> getQueryResults(String query, Set<Map.Entry<String, String>> mapSet) {
+	public List<Object> getQueryResults(String query, Map<String, Object> valueMap) {
 		logger.info("Querying database with SQL Query: " + query);
 		Session session = sessionFactory.openSession();
 		Query<Object> queryObj = session.createQuery(query);
 		// queryObj.setCacheable(true);
 
-		for (Map.Entry<String, String> me : mapSet) {
-			queryObj.setString(me.getKey(), me.getValue());
-		}
+		valueMap.forEach((k, v) -> queryObj.setParameter(k, v));
+
 		List<Object> resultList = queryObj.getResultList();
 		return resultList;
 	}

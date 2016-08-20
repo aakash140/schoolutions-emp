@@ -19,7 +19,9 @@ public class TestApp {
 
 	public static void main(String[] args) throws Exception {
 		EmployeeWSImpl empWs = new EmployeeWSImpl();
-		// empWs.createCredentials("1234", "pass@123".toCharArray());
+
+		addEmp(empWs);
+		empWs.createCredentials("1234", "pass@123".toCharArray());
 
 		String fileName = "1.jpg";
 		File file = new File("C:/Users/Home/Desktop/" + fileName);
@@ -34,7 +36,7 @@ public class TestApp {
 		// "Pass@123".toCharArray());
 		// empWs.deactivateEmployee("1234");
 		// empWs.isAuthorized("1234", "Pass@123".toCharArray());
-		// addEmp(empWs);
+
 		// Employee emp = empWs.getEmployee("1234");
 		// System.out.println(emp.getContact().getWhatsAppNumber());
 		// System.out.println(emp.getAddressSet().toArray());

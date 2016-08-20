@@ -31,7 +31,6 @@ import com.school.employee.bean.Employee;
 import com.school.employee.bean.LoginCredentials;
 import com.school.employee.bean.UserOTP;
 import com.school.employee.dao.EmployeeDAO;
-import com.school.util.DocumentProp;
 import com.school.util.EmailUtil;
 import com.school.util.FileIOUtil;
 import com.school.util.PasswordUtil;
@@ -99,7 +98,7 @@ public class EmployeeWSImpl implements EmployeeWS {
 		try {
 			if (isEmployee(employeeID)) {
 				Employee emp = dao.get(Employee.class, employeeID);
-				emp.setStatus(0);
+				emp.setStatus("0");
 				dao.updateEntity(emp);
 				return StatusCode.OK;
 			} else
@@ -443,17 +442,17 @@ public class EmployeeWSImpl implements EmployeeWS {
 	}
 
 	@Override
-	public DocumentRecords[] getFileNames(String ownerID) {
+	public int[] getFileNames(String ownerID) {
 		String query = "FROM DocumentRecords DR where DR.ownerID=  :ownerID ";
-		Map<String, String> paramMap = new HashMap<>();
+		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("ownerID", ownerID);
-		List<Object> resultList = dao.getQueryResults(query, paramMap.entrySet());
+		List<Object> resultList = dao.getQueryResults(query, paramMap);
 		if (resultList != null) {
-			DocumentRecords[] docArray = new DocumentRecords[resultList.size()];
+			int[] docArray = new int[resultList.size()];
 			Object objArray[] = resultList.toArray();
 			for (int i = 0; i < objArray.length; i++) {
 				DocumentRecords docRecrd = (DocumentRecords) objArray[i];
-				docArray[i] = docRecrd;
+				docArray[i] = docRecrd.getDocType();
 			}
 			return docArray;
 		}
@@ -521,14 +520,19 @@ public class EmployeeWSImpl implements EmployeeWS {
 	}
 
 	private boolean isEmployee(String userID) {
-		String query = "SELECT EMP.empID FROM Employee EMP WHERE EMP.empID='" + userID + "' AND EMP.status='1'";
-		Object obj = dao.getQueryResult(query);
+		String query = "SELECT EMP.empID FROM Employee EMP WHERE EMP.empID=:userID AND EMP.status=:status";
+		Map<String, Object> valueMap = new HashMap<>();
+		valueMap.put("userID", userID);
+		valueMap.put("status", "1");
+		Object obj = dao.getQueryResult(query, valueMap);
 		return obj != null;
 	}
 
 	private boolean isAlreadySignedUp(String userID) {
-		String query = "SELECT LC.userID FROM LoginCredentials LC WHERE LC.userID='" + userID + "'";
-		Object obj = dao.getQueryResult(query);
+		String query = "SELECT LC.userID FROM LoginCredentials LC WHERE LC.userID=:userID";
+		Map<String, Object> valueMap = new HashMap<>();
+		valueMap.put("userID", userID);
+		Object obj = dao.getQueryResult(query, valueMap);
 		return obj != null;
 	}
 
@@ -572,6 +576,7 @@ public class EmployeeWSImpl implements EmployeeWS {
 		// "aakash.gupta140@outlook.com",
 		// "vikas.gupta0502@outlook.com", "pkgn1965@gmail.com" };
 		// new EmployeeWSImpl().sendAnEmail("1234", "Test", "Test", dh);
-		new EmployeeWSImpl().getFile("1234", DocumentProp.DP);
+		boolean result = new EmployeeWSImpl().isEmployee("1234");
+		System.out.println(result);
 	}
 }

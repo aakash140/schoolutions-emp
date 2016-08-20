@@ -3,7 +3,6 @@ package com.school.employee.dao;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.hibernate.Criteria;
 
@@ -19,9 +18,9 @@ public interface EmployeeDAO {
 
 	public <T extends Object> T get(Class<T> classObj, Serializable id);
 
-	public Object getQueryResult(String query);
+	public Object getQueryResult(String query, Map<String, Object> valueMap);
 
-	public List<Object> getQueryResults(String query, Set<Map.Entry<String, String>> mapSet);
+	public List<Object> getQueryResults(String query, Map<String, Object> map);
 
 	public List<Object> getQueryResults(String query);
 

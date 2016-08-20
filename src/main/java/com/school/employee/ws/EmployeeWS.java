@@ -10,7 +10,6 @@ import javax.jws.WebParam;
 import javax.jws.WebResult;
 import javax.jws.WebService;
 
-import com.school.employee.bean.DocumentRecords;
 import com.school.employee.bean.Employee;
 
 @WebService
@@ -86,8 +85,8 @@ public interface EmployeeWS {
 			@WebParam(partName = "FileOwnerID") String ownerID, @WebParam(partName = "FileOwnerType") int ownerType,
 			@WebParam(partName = "FileType") int fileType);
 
-	@WebResult(partName = "DocRecordsArray")
-	public DocumentRecords[] getFileNames(@WebParam(partName = "DocOwnerID") String ownerID);
+	@WebResult(partName = "DocTypeArray")
+	public int[] getFileNames(@WebParam(partName = "DocOwnerID") String ownerID);
 
 	@WebResult(partName = "ResultCode")
 	public int emailandSaveOTP(@WebParam(partName = "EmployeeID") String employeeID,

@@ -26,7 +26,7 @@ public class Employee {
 	private float experience;
 	private ContactDetails contact;
 	private Set<Address> addressSet;
-	private int status = 1;
+	private String status = "1";
 	private Date version;
 
 	public String getEmpID() {
@@ -189,11 +189,11 @@ public class Employee {
 		this.addressSet = addressSet;
 	}
 
-	public int getStatus() {
+	public String getStatus() {
 		return status;
 	}
 
-	public void setStatus(int status) {
+	public void setStatus(String status) {
 		this.status = status;
 	}
 
