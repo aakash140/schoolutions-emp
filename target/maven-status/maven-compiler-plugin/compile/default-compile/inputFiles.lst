@@ -1,4 +1,5 @@
 F:\Schoolutions_WorkSpace\Employee\src\main\java\com\school\employee\ws\EmployeeWSImpl.java
+F:\Schoolutions_WorkSpace\Employee\src\main\java\com\school\employee\bean\UserOTP.java
 F:\Schoolutions_WorkSpace\Employee\src\main\java\com\school\util\FileIOUtil.java
 F:\Schoolutions_WorkSpace\Employee\src\main\java\com\school\employee\dao\EmployeeDAOImpl.java
 F:\Schoolutions_WorkSpace\Employee\src\main\java\com\school\employee\bean\ContactDetails.java
@@ -6,6 +7,7 @@ F:\Schoolutions_WorkSpace\Employee\src\main\java\com\school\employee\bean\Docume
 F:\Schoolutions_WorkSpace\Employee\src\main\java\com\school\employee\ws\EmployeeWS.java
 F:\Schoolutions_WorkSpace\Employee\src\main\java\com\school\employee\bean\Employee.java
 F:\Schoolutions_WorkSpace\Employee\src\main\java\com\school\employee\dao\EmployeeDAO.java
+F:\Schoolutions_WorkSpace\Employee\src\main\java\com\school\util\EmailUtil.java
 F:\Schoolutions_WorkSpace\Employee\src\main\java\com\school\employee\bean\LoginCredentials.java
 F:\Schoolutions_WorkSpace\Employee\src\main\java\com\school\util\DepartmentList.java
 F:\Schoolutions_WorkSpace\Employee\src\main\java\com\school\employee\test\TestApp.java

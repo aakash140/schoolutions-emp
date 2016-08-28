@@ -48,7 +48,8 @@ public class EmailUtil {
 			configureMail();
 		} catch (IOException exception) {
 			logger.error("STATUS CODE: " + StatusCode.INTERNAL_ERROR
-					+ " .Exception occured while loading mail.properties file. Using default values");
+					+ " .Exception occured while loading mail.properties file. Using default values.\n"
+					+ getExceptionDetail(exception));
 		}
 	}
 
@@ -68,7 +69,7 @@ public class EmailUtil {
 			return StatusCode.OK;
 		} catch (MessagingException | UnsupportedEncodingException exception) {
 			logger.error("STATUS CODE: " + StatusCode.EMAILERROR + ": Exception occured while sending the OTP to "
-					+ recepient + "\n" + exception);
+					+ recepient + "\n" + getExceptionDetail(exception));
 			return StatusCode.EMAILERROR;
 		}
 	}
@@ -100,7 +101,7 @@ public class EmailUtil {
 			return StatusCode.OK;
 		} catch (MessagingException | UnsupportedEncodingException exception) {
 			logger.error("STATUS CODE: " + StatusCode.EMAILERROR + ": Exception occured while sending the email to "
-					+ recepient + "\n" + exception);
+					+ recepient + "\n" + getExceptionDetail(exception));
 			return StatusCode.EMAILERROR;
 		}
 	}
@@ -141,7 +142,7 @@ public class EmailUtil {
 
 			} catch (MessagingException | UnsupportedEncodingException exception) {
 				logger.error("STATUS CODE: " + StatusCode.EMAILERROR + ": Exception occured while sending the OTP to "
-						+ recepient + "\n" + exception);
+						+ recepient + "\n" + getExceptionDetail(exception));
 				failedRecepientList[failedEmails++] = recepient;
 			}
 		}
@@ -168,7 +169,7 @@ public class EmailUtil {
 
 		} catch (IOException exception) {
 			logger.error("STATUS CODE: " + StatusCode.INTERNAL_ERROR
-					+ " .Exception occured while loading mail.properties file.\n" + exception);
+					+ " .Exception occured while loading mail.properties file.\n" + getExceptionDetail(exception));
 			throw new IOException();
 		}
 
@@ -178,6 +179,15 @@ public class EmailUtil {
 		prop.put(authFlag, prop.getProperty(authFlag, "true"));
 		prop.put(smtpPort, prop.getProperty(smtpPort, "465"));
 
+	}
+
+	private static String getExceptionDetail(Throwable exception) {
+		StringBuffer sb = new StringBuffer();
+		while (exception != null) {
+			sb.append(exception.toString());
+			exception = exception.getCause();
+		}
+		return sb.toString();
 	}
 
 	public static void main(String[] args) {

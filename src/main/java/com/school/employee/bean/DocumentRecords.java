@@ -19,7 +19,6 @@ public class DocumentRecords implements Serializable {
 	private Date version;
 
 	public DocumentRecords() {
-
 	}
 
 	public DocumentRecords(String ownerID, int docType) {
@@ -69,10 +68,16 @@ public class DocumentRecords implements Serializable {
 
 		DocumentRecords doc = (DocumentRecords) obj;
 
-		if (this.ownerID.equalsIgnoreCase(doc.getOwnerID()) && (this.getDocType() == doc.getDocType())
-				&& (this.getDocLocation().equalsIgnoreCase(doc.getDocLocation()))) {
+		boolean isOwnerIDequal = ownerID == doc.getOwnerID()
+				|| (ownerID != null && ownerID.equalsIgnoreCase(doc.getOwnerID()));
+
+		boolean isDocTypeEqual = docType == doc.getDocType();
+
+		boolean isDocLocEqual = docLocation == doc.getDocLocation()
+				|| (docLocation != null && docLocation.equalsIgnoreCase(doc.getDocLocation()));
+
+		if (isOwnerIDequal && isDocTypeEqual && isDocLocEqual)
 			return true;
-		}
 
 		return false;
 	}

@@ -11,6 +11,8 @@ import javax.jws.WebResult;
 import javax.jws.WebService;
 
 import com.school.employee.bean.Employee;
+import com.school.employee.bean.EmployeeAttendance;
+import com.school.employee.bean.StartOfDay;
 
 @WebService
 public interface EmployeeWS {
@@ -40,6 +42,7 @@ public interface EmployeeWS {
 	public int createCredentials(@WebParam(partName = "userID") String userID,
 			@WebParam(partName = "loginPassword") char[] password);
 
+	@WebMethod(operationName = "updateForgottenPassword")
 	@WebResult(partName = "ResultCode")
 	public int updatePassword(@WebParam(partName = "userID") String userID, @WebParam(partName = "OTP") String OTP,
 			@WebParam(partName = "newPassword") char[] newPassword);
@@ -48,6 +51,25 @@ public interface EmployeeWS {
 	public int updatePassword(@WebParam(partName = "userID") String userID,
 			@WebParam(partName = "oldPassword") char[] oldPassword,
 			@WebParam(partName = "newPassword") char[] newPassword);
+
+	@WebResult(partName = "ResultCode")
+	public int beginSchoolSession(@WebParam(partName = "WorkDate") Calendar workDay,
+			@WebParam(partName = "EmployeeID") String employeeID);
+
+	@WebResult(partName = "ResultCode")
+	public int markAttendance(@WebParam(partName = "WorkDate") Calendar workDay,
+			@WebParam(partName = "EmployeeIDs") String[] employeeIDs, @WebParam(partName = "Status") String status);
+
+	@WebResult(partName = "SODArray")
+	public StartOfDay[] getWorkDays(@WebParam(partName = "StartDate") Calendar startDate,
+			@WebParam(partName = "EndDate") Calendar endDate);
+
+	@WebResult(partName = "AttendanceArray")
+	public EmployeeAttendance[] getEmployeeAttendanceReport(@WebParam(partName = "EmployeeID") String employeeID,
+			@WebParam(partName = "StartDate") Calendar startDate, @WebParam(partName = "EndDate") Calendar endDate);
+
+	@WebResult(partName = "AttendanceArray")
+	public EmployeeAttendance[] getAttendanceOnDate(@WebParam(partName = "WorkDate") Calendar workday);
 
 	@WebMethod(operationName = "lookupEmployee")
 	@WebResult(partName = "EmployeeArray")
@@ -96,4 +118,8 @@ public interface EmployeeWS {
 	public int sendAnEmail(@WebParam(partName = "EmployeeID") String employeeID,
 			@WebParam(partName = "MessageBody") String messageBody, @WebParam(partName = "Subject") String subject,
 			@WebParam(partName = "MimeAttachments") DataHandler[] attachments);
+
+	public boolean isEmployee(@WebParam(partName = "EmployeeID") String userID);
+
+	public boolean isSchoolAlreadyOpen(@WebParam(partName = "WorkDate") Calendar workDay);
 }

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC 
+ "-//Hibernate/Hibernate Mapping DTD//EN"
+ "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+ 
+<hibernate-mapping>
+	<class name="com.school.employee.bean.EmployeeAttendance"  table="EMP_ATNDNC">
+		<meta attribute="class-description">
+			Employee Attendance POJOss
+		</meta>
+		<composite-id>
+			<key-property 		name="workDay"		column="WORK_DAY"	type="calendar_date"></key-property>
+			<key-property 		name="employeeID"	column="EMP_ID"></key-property>
+		</composite-id>
+		<timestamp				name="version"		column="RCRD_VER" source="db"></timestamp>
+		<property				name="status"		column="STATUS"></property>
+		<property				name="timestamp"	column="TMSTMP"></property>	
+	</class>
+</hibernate-mapping> 

@@ -41,7 +41,7 @@ public class TestApp {
 		// System.out.println(emp.getContact().getWhatsAppNumber());
 		// System.out.println(emp.getAddressSet().toArray());
 		// System.out.println(empWs.deactivateEmployee("1234"));
-		empWs.updatePassword("1234", "abc4321", "pass@1234".toCharArray());
+		// empWs.updatePassword("1234", "abc4321", "pass@1234".toCharArray());
 		System.out.println(empWs.emailandSaveOTP("1234", "abc43212"));
 		Calendar dob = Calendar.getInstance();
 		dob.set(1990, 10, 20);

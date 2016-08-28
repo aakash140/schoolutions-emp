@@ -10,8 +10,6 @@ public interface EmployeeDAO {
 
 	public void save(Object detailsObject);
 
-	public int update(String query);
-
 	public void saveOrUpdate(Object entity);
 
 	public void updateEntity(Object entity);
@@ -20,9 +18,7 @@ public interface EmployeeDAO {
 
 	public Object getQueryResult(String query, Map<String, Object> valueMap);
 
-	public List<Object> getQueryResults(String query, Map<String, Object> map);
-
-	public List<Object> getQueryResults(String query);
+	public List<Object> getQueryResults(String query, Map<String, Object> valueMap);
 
 	public <T extends Object> Criteria getCriteria(Class<T> entity, String alias);
 

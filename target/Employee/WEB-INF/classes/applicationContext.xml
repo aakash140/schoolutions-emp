@@ -56,6 +56,11 @@
 		scope="prototype">
 	</bean>
 	
+		<bean 
+		id="userOTPPOJO" 
+		class="com.school.employee.bean.UserOTP"
+		scope="prototype">
+	</bean>
 		
 	<bean 
 		id="dataSource" 
@@ -101,6 +106,7 @@
 				<value>credentials.hbm.xml</value>
 				<value>address.hbm.xml</value>
 				<value>document.hbm.xml</value>
+				<value>otp.hbm.xml</value>
 			</list>
 		</property>
 		<property name="hibernateProperties" >

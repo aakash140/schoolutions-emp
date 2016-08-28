@@ -28,7 +28,9 @@ import org.springframework.core.io.Resource;
 
 import com.school.employee.bean.DocumentRecords;
 import com.school.employee.bean.Employee;
+import com.school.employee.bean.EmployeeAttendance;
 import com.school.employee.bean.LoginCredentials;
+import com.school.employee.bean.StartOfDay;
 import com.school.employee.bean.UserOTP;
 import com.school.employee.dao.EmployeeDAO;
 import com.school.util.EmailUtil;
@@ -56,16 +58,16 @@ public class EmployeeWSImpl implements EmployeeWS {
 		logger.info("Getting details for Employee ID: " + employeeID);
 		Employee emp = null;
 		try {
-			if (isEmployee(employeeID))
-				emp = dao.get(Employee.class, employeeID);
+			emp = dao.get(Employee.class, employeeID);
 
-			if (emp == null) {
-				logger.info("Employee with Employee ID: " + employeeID + " does not exist in records.");
-			}
+			if (emp == null)
+				emp = (Employee) factory.getBean("employeePOJO");
+
 			return emp;
 		} catch (Exception exception) {
 			logger.error("STATUS CODE: " + StatusCode.DBEERROR
-					+ ":Exception occured while fetching details for Employee ID: " + employeeID + ":" + exception);
+					+ ":Exception occured while fetching details for Employee ID: " + employeeID + "\n"
+					+ getExceptionDetail(exception));
 			return null;
 		}
 	}
@@ -76,9 +78,6 @@ public class EmployeeWSImpl implements EmployeeWS {
 		try {
 			String employeeID = employee.getEmpID();
 			if (isEmployee(employeeID)) {
-				logger.error("STATUS CODE: " + StatusCode.DUPLICATE
-						+ ": Cannot persist duplicate employee in database.Employee ID " + employeeID
-						+ " already exists in records");
 				return StatusCode.DUPLICATE;
 			}
 			dao.save(employee);
@@ -88,7 +87,7 @@ public class EmployeeWSImpl implements EmployeeWS {
 
 		} catch (Exception exception) {
 			logger.error("STATUS CODE: " + StatusCode.DBEERROR + ": Exception occured while saving the employee '"
-					+ employee.getEmpID() + "' : " + exception);
+					+ employee.getEmpID() + "'\n" + getExceptionDetail(exception));
 			return StatusCode.DBEERROR;
 		}
 	}
@@ -96,8 +95,8 @@ public class EmployeeWSImpl implements EmployeeWS {
 	@Override
 	public int deactivateEmployee(String employeeID) {
 		try {
-			if (isEmployee(employeeID)) {
-				Employee emp = dao.get(Employee.class, employeeID);
+			Employee emp = dao.get(Employee.class, employeeID);
+			if (emp != null) {
 				emp.setStatus("0");
 				dao.updateEntity(emp);
 				return StatusCode.OK;
@@ -105,7 +104,7 @@ public class EmployeeWSImpl implements EmployeeWS {
 				return StatusCode.NOT_FOUND;
 		} catch (Exception exception) {
 			logger.error("STATUS CODE: " + StatusCode.DBEERROR + ": Exception occured while deactivating the employee '"
-					+ employeeID + "' : " + exception);
+					+ employeeID + "'\n" + getExceptionDetail(exception));
 			return StatusCode.DBEERROR;
 		}
 	}
@@ -119,7 +118,7 @@ public class EmployeeWSImpl implements EmployeeWS {
 					+ " have been updated successfully.");
 			return StatusCode.OK;
 		} catch (Exception exception) {
-			logger.error("STATUS CODE:" + StatusCode.DBEERROR + ": " + exception);
+			logger.error("STATUS CODE:" + StatusCode.DBEERROR + "\n" + getExceptionDetail(exception));
 			return StatusCode.DBEERROR;
 		}
 	}
@@ -139,27 +138,19 @@ public class EmployeeWSImpl implements EmployeeWS {
 						logger.info("STATUS CODE: " + StatusCode.OK + ": Employee ID " + userID + " is authorized");
 						return StatusCode.OK;
 					} else if (credentials.getFailedAttempts() == 5) {
-						logger.error("STATUS CODE: " + StatusCode.LOCKED_OUT + ": Employee ID " + userID
-								+ " has been locked out due to 5 consequent incorrect login attempts");
 						return StatusCode.LOCKED_OUT;
 					} else {
 						updateInvalidLoginAttempt(credentials);
-						logger.error("STATUS CODE: " + StatusCode.FORBIDDEN
-								+ ": Invalid Credentials used while signing in with user id " + userID);
 						return StatusCode.FORBIDDEN;
 					}
 				} catch (InvalidKeySpecException | NoSuchAlgorithmException exception) {
-					logger.error("STATUS CODE: " + StatusCode.INTERNAL_ERROR + ":" + exception);
+					logger.error("STATUS CODE: " + StatusCode.INTERNAL_ERROR + "\n" + getExceptionDetail(exception));
 					return StatusCode.INTERNAL_ERROR;
 				}
 			} else {
-				logger.error("STATUS CODE:" + StatusCode.NOT_SIGNED_UP + ": Employee ID " + userID
-						+ " has not signed up yet.");
 				return StatusCode.NOT_SIGNED_UP;
 			}
 		} else {
-			logger.info(
-					"STATUS CODE: " + StatusCode.NOT_FOUND + "Employee ID " + userID + " does not exist in database.");
 			return StatusCode.NOT_FOUND;
 		}
 	}
@@ -179,18 +170,13 @@ public class EmployeeWSImpl implements EmployeeWS {
 							+ " have been successfully created");
 					return StatusCode.CREATED;
 				} catch (Exception exception) {
-					logger.error("STATUS CODE: " + StatusCode.INTERNAL_ERROR + ": " + exception);
+					logger.error("STATUS CODE: " + StatusCode.INTERNAL_ERROR + "\n" + getExceptionDetail(exception));
 					return StatusCode.INTERNAL_ERROR;
 				}
 			} else {
-				logger.error("STATUS CODE: " + StatusCode.DUPLICATE
-						+ ": Cannot persist duplicate credentials in database.User ID " + userID
-						+ " already exists in records");
 				return StatusCode.DUPLICATE;
 			}
 		} else {
-			logger.error(
-					"STATUS CODE: " + StatusCode.NOT_FOUND + "Employee ID " + userID + " does not exist in database.");
 			return StatusCode.NOT_FOUND;
 		}
 	}
@@ -210,12 +196,10 @@ public class EmployeeWSImpl implements EmployeeWS {
 						+ ": Could not update the password for locked out Employee ID '" + userID + "'");
 				return StatusCode.LOCKED_OUT;
 			} else {
-				logger.error("STATUS CODE: " + StatusCode.FORBIDDEN
-						+ ": Invalid Credentials used while updating password for user id " + userID);
 				return StatusCode.FORBIDDEN;
 			}
 		} catch (NoSuchAlgorithmException | InvalidKeySpecException exception) {
-			logger.error("STATUS CODE: " + StatusCode.INTERNAL_ERROR + ":" + exception);
+			logger.error("STATUS CODE: " + StatusCode.INTERNAL_ERROR + "\n" + getExceptionDetail(exception));
 			return StatusCode.INTERNAL_ERROR;
 		}
 	}
@@ -244,7 +228,7 @@ public class EmployeeWSImpl implements EmployeeWS {
 						} catch (Exception exception) {
 							logger.error("STATUS CODE: " + StatusCode.INTERNAL_ERROR
 									+ ": Error occured while updating password for user id '" + userID + "'\n"
-									+ exception);
+									+ getExceptionDetail(exception));
 							return StatusCode.INTERNAL_ERROR;
 						}
 					} else {
@@ -257,6 +241,121 @@ public class EmployeeWSImpl implements EmployeeWS {
 				return StatusCode.INTERNAL_ERROR;
 		} else
 			return StatusCode.NOT_FOUND;
+	}
+
+	@Override
+	public int beginSchoolSession(Calendar workDay, String employeeID) {
+		if (!isSchoolAlreadyOpen(workDay)) {
+			StartOfDay sod = (StartOfDay) factory.getBean("sodPOJO");
+			LocalDateTime now = LocalDateTime.now();
+			sod.setWorkDay(workDay);
+			sod.setEmployeeID(employeeID);
+			sod.setTimestamp(now);
+			try {
+				dao.save(sod);
+				logger.info("School Session on " + workDay.toString() + " began at " + now.toString());
+				return StatusCode.CREATED;
+			} catch (Exception exception) {
+				logger.error("STATUS CODE:" + StatusCode.DBEERROR + ": An error occured while starting the day on "
+						+ workDay.toString() + ".\n" + getExceptionDetail(exception));
+				return StatusCode.DBEERROR;
+			}
+		} else
+			return StatusCode.DUPLICATE;
+	}
+
+	/**
+	 * Before calling this method caller should verify the validity of employee
+	 * id(s) and Date of work.
+	 *
+	 * @param workDay
+	 * @param employeeIDs
+	 * @param status
+	 * @return Status Code
+	 */
+	@Override
+	public int markAttendance(Calendar workDay, String[] employeeIDs, String status) {
+		for (String empID : employeeIDs) {
+			EmployeeAttendance atndnc = dao.get(EmployeeAttendance.class, new EmployeeAttendance(workDay, empID));
+			LocalDateTime now = LocalDateTime.now();
+			atndnc.setStatus(status);
+			atndnc.setTimestamp(now);
+			try {
+				dao.updateEntity(atndnc);
+				logger.info("Attendance for employee '" + empID + "'for " + workDay.toString() + " has been marked at "
+						+ now.toString());
+			} catch (Exception exception) {
+				logger.error("STATUS CODE:" + StatusCode.DBEERROR
+						+ ": An error occured while marking the attendance for employee '" + empID + "'for "
+						+ workDay.toString() + "\n" + getExceptionDetail(exception));
+				return StatusCode.DBEERROR;
+			}
+		}
+		return StatusCode.OK;
+	}
+
+	@Override
+	public StartOfDay[] getWorkDays(Calendar startDate, Calendar endDate) {
+
+		Criteria criteria = dao.getCriteria(StartOfDay.class, "SOD");
+		criteria.add(Restrictions.between("SOD.workDay", startDate, endDate));
+		criteria.addOrder(Order.asc("SOD.workDay"));
+
+		try {
+			List<Object> resultList = dao.getSearchResult(criteria);
+
+			if (resultList != null && resultList.size() > 0) {
+				StartOfDay[] sod = resultList.toArray(new StartOfDay[resultList.size()]);
+				return sod;
+			} else
+				return new StartOfDay[resultList.size()];
+		} catch (Exception exception) {
+			logger.error("STATUS CODE: " + StatusCode.INTERNAL_ERROR
+					+ "An error occured while searching for workdays.\n" + getExceptionDetail(exception));
+			return null;
+		}
+	}
+
+	public EmployeeAttendance[] getEmployeeAttendanceReport(String employeeID, Calendar startDate, Calendar endDate) {
+		Criteria criteria = dao.getCriteria(EmployeeAttendance.class, "Emp");
+
+		criteria.add(Restrictions.eq("Emp.employeeID", employeeID).ignoreCase());
+		criteria.add(Restrictions.between("Emp.workDay", startDate, endDate));
+		criteria.addOrder(Order.asc("Emp.workDay"));
+		try {
+			List<Object> resultList = dao.getSearchResult(criteria);
+			if (resultList != null && resultList.size() > 0) {
+				EmployeeAttendance[] empAtndnc = resultList.toArray(new EmployeeAttendance[resultList.size()]);
+				return empAtndnc;
+			} else
+				return new EmployeeAttendance[resultList.size()];
+		} catch (Exception exception) {
+			logger.error("STATUS CODE: " + StatusCode.INTERNAL_ERROR
+					+ "An error occured while searching attendance for employee '" + employeeID + "'.\n"
+					+ getExceptionDetail(exception));
+			return null;
+		}
+
+	}
+
+	public EmployeeAttendance[] getAttendanceOnDate(Calendar workday) {
+		Criteria criteria = dao.getCriteria(EmployeeAttendance.class, "Emp");
+
+		criteria.add(Restrictions.eq("Emp.workDay", workday));
+		criteria.addOrder(Order.asc("Emp.workDay"));
+		try {
+			List<Object> resultList = dao.getSearchResult(criteria);
+			if (resultList != null && resultList.size() > 0) {
+				EmployeeAttendance[] empAtndnc = resultList.toArray(new EmployeeAttendance[resultList.size()]);
+				return empAtndnc;
+			} else
+				return new EmployeeAttendance[resultList.size()];
+		} catch (Exception exception) {
+			logger.error(
+					"STATUS CODE: " + StatusCode.INTERNAL_ERROR + "An error occured while searching attendance for '"
+							+ workday.toString() + "'.\n" + getExceptionDetail(exception));
+			return null;
+		}
 	}
 
 	@Override
@@ -312,19 +411,16 @@ public class EmployeeWSImpl implements EmployeeWS {
 			List<Object> list = dao.getSearchResult(criteria);
 
 			if (list != null && list.size() > 0) {
-				Object[] obj = list.toArray();
-				Employee[] employees = new Employee[list.size()];
-
-				for (int i = 0; i < obj.length; i++)
-					employees[i] = (Employee) obj[i];
+				Employee[] employees = list.toArray(new Employee[list.size()]);
 				return employees;
-			}
+			} else
+				return new Employee[list.size()];
 		} catch (Exception exception) {
 			logger.error("STATUS CODE: " + StatusCode.DBEERROR + ": An exception occured during employee lookup. "
-					+ exception);
+					+ getExceptionDetail(exception));
 			return null;
 		}
-		return null;
+
 	}
 
 	@Override
@@ -372,13 +468,14 @@ public class EmployeeWSImpl implements EmployeeWS {
 			if (list.size() > 0) {
 				Long recordsNum = (Long) list.get(0);
 				return recordsNum;
-			}
+			} else
+				return 0L;
 		} catch (Exception exception) {
 			logger.error("STATUS CODE: " + StatusCode.DBEERROR + ": An exception occured during employee lookup.\n "
-					+ exception);
-			return 0L;
+					+ getExceptionDetail(exception));
+			return -1L;
 		}
-		return 0L;
+
 	}
 
 	@Override
@@ -411,7 +508,8 @@ public class EmployeeWSImpl implements EmployeeWS {
 				return StatusCode.CREATED;
 			} catch (Exception exception) {
 				logger.error("STATUS CODE: " + StatusCode.DBEERROR + " :Error occured while saving doc/file '"
-						+ dh.getName() + "' for ownerID '" + ownerID + "' records in database\n" + exception);
+						+ dh.getName() + "' for ownerID '" + ownerID + "' records in database\n"
+						+ getExceptionDetail(exception));
 				return StatusCode.DBEERROR;
 			}
 		} else
@@ -433,7 +531,7 @@ public class EmployeeWSImpl implements EmployeeWS {
 				return StatusCode.CREATED;
 			} catch (Exception exception) {
 				logger.error("STATUS CODE: " + StatusCode.DBEERROR + " :Error occured while updating doc/file '"
-						+ dh.getName() + "' records in database\n" + exception);
+						+ dh.getName() + "' records in database\n" + getExceptionDetail(exception));
 				return StatusCode.DBEERROR;
 			}
 		} else
@@ -510,8 +608,9 @@ public class EmployeeWSImpl implements EmployeeWS {
 				} else
 					return StatusCode.EMAIL_NOT_FOUND;
 			} catch (Exception exception) {
-				logger.error("STATUS CODE: " + StatusCode.DBEERROR
-						+ ". Exception occured while saving OTP for employee '" + employeeID + "'.\n" + exception);
+				logger.error(
+						"STATUS CODE: " + StatusCode.DBEERROR + ". Exception occured while saving OTP for employee '"
+								+ employeeID + "'.\n" + getExceptionDetail(exception));
 				return StatusCode.DBEERROR;
 			}
 
@@ -519,13 +618,20 @@ public class EmployeeWSImpl implements EmployeeWS {
 			return StatusCode.NOT_FOUND;
 	}
 
-	private boolean isEmployee(String userID) {
+	@Override
+	public boolean isEmployee(String userID) {
 		String query = "SELECT EMP.empID FROM Employee EMP WHERE EMP.empID=:userID AND EMP.status=:status";
 		Map<String, Object> valueMap = new HashMap<>();
 		valueMap.put("userID", userID);
 		valueMap.put("status", "1");
 		Object obj = dao.getQueryResult(query, valueMap);
 		return obj != null;
+	}
+
+	@Override
+	public boolean isSchoolAlreadyOpen(Calendar workDay) {
+		StartOfDay sod = dao.get(StartOfDay.class, workDay);
+		return sod != null;
 	}
 
 	private boolean isAlreadySignedUp(String userID) {
@@ -543,7 +649,7 @@ public class EmployeeWSImpl implements EmployeeWS {
 			dao.updateEntity(credentials);
 			logger.info("Updated invalid login attempts counter for user id " + credentials.getUserID());
 		} catch (Exception exception) {
-			logger.error("STATUS CODE:" + StatusCode.DBEERROR + ": " + exception);
+			logger.error("STATUS CODE:" + StatusCode.DBEERROR + ": " + getExceptionDetail(exception));
 		}
 	}
 
@@ -558,11 +664,22 @@ public class EmployeeWSImpl implements EmployeeWS {
 			dao.updateEntity(usrOTP);
 		} catch (Exception exception) {
 			logger.error("STATUS CODE: " + StatusCode.DBEERROR + ": Error occured while deactivating OTP for user ID '"
-					+ usrOTP.getUserID() + "'.\n" + exception);
+					+ usrOTP.getUserID() + "'.\n" + getExceptionDetail(exception));
 		}
 	}
 
+	private String getExceptionDetail(Throwable exception) {
+		StringBuffer sb = new StringBuffer();
+		while (exception != null) {
+			sb.append(exception.toString());
+			exception = exception.getCause();
+		}
+		return sb.toString();
+	}
+
 	public static void main(String[] args) {
+		// new EmployeeWSImpl().getEmployee("1234");
+		new EmployeeWSImpl().deactivateEmployee("1234");
 		File f1 = new File("C:\\Users\\Home\\Desktop\\1.jpg");
 		File f2 = new File("C:\\Users\\Home\\Desktop\\CREATE_TABLE.sql");
 		File f3 = new File("C:\\Users\\Home\\Desktop\\possuite-141-dm-ddl.rar");
@@ -576,7 +693,19 @@ public class EmployeeWSImpl implements EmployeeWS {
 		// "aakash.gupta140@outlook.com",
 		// "vikas.gupta0502@outlook.com", "pkgn1965@gmail.com" };
 		// new EmployeeWSImpl().sendAnEmail("1234", "Test", "Test", dh);
-		boolean result = new EmployeeWSImpl().isEmployee("1234");
+		String[] empIDs = new String[] { "1234", "4321", "1111" };
+		// int result = new EmployeeWSImpl().beginSchoolSession(new Date(2016,
+		// 7, 26), "1234");
+		// int result = new EmployeeWSImpl().markAttendance(new Date(2016, 9,
+		// 26), empIDs, "1");
+
+		Calendar sd = Calendar.getInstance();
+		sd.set(2016, 7, 25);
+
+		Calendar ed = Calendar.getInstance();
+		ed.set(2016, 7, 27);
+
+		StartOfDay[] result = new EmployeeWSImpl().getWorkDays(ed, ed);
 		System.out.println(result);
 	}
 }

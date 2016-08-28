@@ -53,27 +53,14 @@ public class EmployeeDAOImpl implements EmployeeDAO, ServletContextListener {
 		session.close();
 	}
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public int update(String query) {
-		logger.info("Updating database record with SQL query: " + query);
-		Session session = sessionFactory.openSession();
-		Transaction trn = session.beginTransaction();
-		Query<Object> queryObj = session.createQuery(query);
-		// queryObj.setCacheable(true);
-		int result = queryObj.executeUpdate();
-		trn.commit();
-		return result;
-	}
-
 	@Override
 	public void updateEntity(Object detailsObject) {
 		logger.info("Updating detailsObject: " + detailsObject);
-		// Session session = sessionFactory.openSession();
-		Transaction trn = globalSession.beginTransaction();
-		globalSession.update(detailsObject);
+		Session session = sessionFactory.openSession();
+		Transaction trn = session.beginTransaction();
+		session.update(detailsObject);
 		trn.commit();
-		// session.close();
+		session.close();
 	}
 
 	@Override
@@ -113,17 +100,6 @@ public class EmployeeDAOImpl implements EmployeeDAO, ServletContextListener {
 
 		valueMap.forEach((k, v) -> queryObj.setParameter(k, v));
 
-		List<Object> resultList = queryObj.getResultList();
-		return resultList;
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public List<Object> getQueryResults(String query) {
-		logger.info("Querying database with SQL Query: " + query);
-		Session session = sessionFactory.openSession();
-		Query<Object> queryObj = session.createQuery(query);
-		// queryObj.setCacheable(true);
 		List<Object> resultList = queryObj.getResultList();
 		return resultList;
 	}

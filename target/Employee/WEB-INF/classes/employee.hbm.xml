@@ -14,7 +14,7 @@
 		<!-- Following version property is not persisting the time stamp in database. So commented it. -->  
 		<!-- <version     name="version" 		column="RCRD_VER"       type="timestamp" generated="always"/> -->
 		
-		<timestamp 	 name="version" 		column="RCRD_VER" source="db"/>
+		<timestamp 	 name="version" 		column="RCRD_VER" source="db"></timestamp>
 		
 		<property 	 name="firstName" 		column="EMP_FNAME"></property>
 		<property 	 name="middleName" 		column="EMP_MNAME"></property>

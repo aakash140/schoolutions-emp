@@ -39,7 +39,7 @@ public class FileIOUtil {
 						+ " .Exception occured while loading docProp.properties file.Using default values.");
 		} catch (IOException exception) {
 			logger.error("STATUS CODE: " + StatusCode.INTERNAL_ERROR
-					+ " .Exception occured while loading docProp.properties file.\n" + exception);
+					+ " .Exception occured while loading docProp.properties file.\n" + getExceptionDetail(exception));
 		}
 	}
 
@@ -69,8 +69,8 @@ public class FileIOUtil {
 			fout.close();
 			return file;
 		} catch (IOException exception) {
-			logger.error("STATUS CODE:" + StatusCode.INTERNAL_ERROR + " :Error occured while uploading a document. "
-					+ exception);
+			logger.error("STATUS CODE:" + StatusCode.INTERNAL_ERROR + " :Error occured while uploading a document.\n"
+					+ getExceptionDetail(exception));
 			return null;
 		}
 
@@ -123,6 +123,15 @@ public class FileIOUtil {
 		fileDest += fileName;
 
 		return fileDest;
+	}
+
+	private static String getExceptionDetail(Throwable exception) {
+		StringBuffer sb = new StringBuffer();
+		while (exception != null) {
+			sb.append(exception.toString());
+			exception = exception.getCause();
+		}
+		return sb.toString();
 	}
 
 	public static void main(String... args) {
