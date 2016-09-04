@@ -63,8 +63,34 @@ public class EmployeeDAOImpl implements EmployeeDAO, ServletContextListener {
 		session.close();
 	}
 
+	@SuppressWarnings("unchecked")
+	public int update(String query, Map<String, Object> valueMap) {
+		logger.info("Updating record with query: " + query);
+		Session session = sessionFactory.openSession();
+		Transaction trn = session.beginTransaction();
+		Query<Object> queryObj = session.createQuery(query);
+
+		valueMap.forEach((k, v) -> queryObj.setParameter(k, v));
+		int result = queryObj.executeUpdate();
+
+		trn.commit();
+		session.close();
+
+		return result;
+	}
+
 	@Override
 	public <T extends Object> T get(Class<T> classObj, Serializable id) {
+		logger.info("Fetching " + classObj.toGenericString() + " details with identifier id '" + id + "'");
+		Session session = sessionFactory.openSession();
+		T resultEntity = session.get(classObj, id);
+		session.close();
+		return resultEntity;
+
+	}
+
+	@Override
+	public <T extends Object> T getAndCache(Class<T> classObj, Serializable id) {
 		logger.info("Fetching " + classObj.toGenericString() + " details with identifier id '" + id + "'");
 		// Session session = sessionFactory.openSession();
 		T resultEntity = globalSession.get(classObj, id);

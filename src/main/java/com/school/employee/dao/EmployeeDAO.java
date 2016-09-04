@@ -14,7 +14,11 @@ public interface EmployeeDAO {
 
 	public void updateEntity(Object entity);
 
+	public int update(String query, Map<String, Object> valueMap);
+
 	public <T extends Object> T get(Class<T> classObj, Serializable id);
+
+	public <T extends Object> T getAndCache(Class<T> classObj, Serializable id);
 
 	public Object getQueryResult(String query, Map<String, Object> valueMap);
 

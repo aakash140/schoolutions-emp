@@ -29,9 +29,17 @@ public interface EmployeeWS {
 
 	@WebMethod(operationName = "deleteEmployee")
 	@WebResult(partName = "ResultCode")
-	public int deactivateEmployee(@WebParam(partName = "employeeID") String employeeID);
+	public int deactivateEmployee(@WebParam(partName = "loginID") String loginID,
+			@WebParam(partName = "employeeID") String employeeID);
 
-	@WebMethod
+	@WebResult(partName = "ResultCode")
+	public int activateEmployee(@WebParam(partName = "loginID") String loginID,
+			@WebParam(partName = "employeeID") String employeeID);
+
+	@WebResult(partName = "ResultCode")
+	public int unlockEmployee(@WebParam(partName = "loginID") String loginID,
+			@WebParam(partName = "employeeID") String employeeID);
+
 	@WebResult(partName = "ResultCode")
 	public int isAuthorized(@WebParam(partName = "userID") String userID,
 			@WebParam(partName = "loginPassword") char[] password)

@@ -58,47 +58,56 @@ public class EmployeeWSImpl implements EmployeeWS {
 		logger.info("Getting details for Employee ID: " + employeeID);
 		Employee emp = null;
 		try {
-			emp = dao.get(Employee.class, employeeID);
+			emp = dao.getAndCache(Employee.class, employeeID);
 
 			if (emp == null)
 				emp = (Employee) factory.getBean("employeePOJO");
 
 			return emp;
 		} catch (Exception exception) {
-			logger.error("STATUS CODE: " + StatusCode.DBEERROR
-					+ ":Exception occured while fetching details for Employee ID: " + employeeID + "\n"
-					+ getExceptionDetail(exception));
+			logger.error(
+					"STATUS CODE: " + StatusCode.DBEERROR + ":Exception occured while fetching details for employee '"
+							+ employeeID + "' \n" + getExceptionDetail(exception));
 			return null;
 		}
 	}
 
 	@Override
 	public int saveEmployee(Employee employee) {
-		logger.info("Saving employee details in database.");
 		try {
 			String employeeID = employee.getEmpID();
+
 			if (isEmployee(employeeID)) {
+				logger.error("STATUS CODE: " + StatusCode.DUPLICATE
+						+ ": Duplicate details cannot be saved for employee '" + employeeID + "'.");
 				return StatusCode.DUPLICATE;
 			}
+
 			dao.save(employee);
-			logger.info("STATUS CODE: " + StatusCode.CREATED + ": Employee details for Employee ID: " + employeeID
-					+ " has been successfully saved in database");
+			logger.info("STATUS CODE: " + StatusCode.CREATED + ": Employee details for employee '" + employeeID
+					+ "' have been successfully saved in database");
+
 			return StatusCode.CREATED;
 
 		} catch (Exception exception) {
 			logger.error("STATUS CODE: " + StatusCode.DBEERROR + ": Exception occured while saving the employee '"
 					+ employee.getEmpID() + "'\n" + getExceptionDetail(exception));
+
 			return StatusCode.DBEERROR;
 		}
 	}
 
 	@Override
-	public int deactivateEmployee(String employeeID) {
+	public int deactivateEmployee(String loginID, String employeeID) {
 		try {
 			Employee emp = dao.get(Employee.class, employeeID);
 			if (emp != null) {
 				emp.setStatus("0");
 				dao.updateEntity(emp);
+
+				logger.info("STATUS CODE: " + StatusCode.OK + ": Employee '" + employeeID
+						+ "' has been deactivated by employee '" + loginID + "'");
+
 				return StatusCode.OK;
 			} else
 				return StatusCode.NOT_FOUND;
@@ -110,15 +119,69 @@ public class EmployeeWSImpl implements EmployeeWS {
 	}
 
 	@Override
-	public int updateEmployee(Employee employee) {
+	public int activateEmployee(String loginID, String employeeID) {
 		try {
-			String employeeID = employee.getEmpID();
+			Employee emp = dao.get(Employee.class, employeeID);
+			if (emp != null) {
+				emp.setStatus("1");
+				dao.updateEntity(emp);
+
+				logger.info("STATUS CODE: " + StatusCode.OK + ": Employee '" + employeeID
+						+ "' has been activated by employee '" + loginID + "'");
+
+				return StatusCode.OK;
+			} else
+				return StatusCode.NOT_FOUND;
+		} catch (Exception exception) {
+			logger.error("STATUS CODE: " + StatusCode.DBEERROR + ": Exception occured while activating the employee '"
+					+ employeeID + "'\n" + getExceptionDetail(exception));
+			return StatusCode.DBEERROR;
+		}
+	}
+
+	@Override
+	public int unlockEmployee(String loginID, String employeeID) {
+		if (isEmployee(employeeID)) {
+			if (isAlreadySignedUp(employeeID)) {
+				String query = "UPDATE LoginCredentials LC SET LC.failedAttempts=:attempts WHERE LC.userID=:userID";
+
+				Map<String, Object> valueMap = new HashMap<>();
+				valueMap.put("attempts", 0);
+				valueMap.put("userID", employeeID);
+
+				try {
+					dao.update(query, valueMap);
+
+					logger.error("STATUS CODE: " + StatusCode.DBEERROR + ": Employee '" + employeeID
+							+ "' has been unlocked by employee '" + loginID + "'");
+
+					return StatusCode.OK;
+				} catch (Exception exception) {
+					logger.error(
+							"STATUS CODE: " + StatusCode.DBEERROR + ": Exception occured while unlocking the employee '"
+									+ employeeID + "'\n" + getExceptionDetail(exception));
+					return StatusCode.DBEERROR;
+				}
+			} else
+				return StatusCode.NOT_SIGNED_UP;
+		} else
+			return StatusCode.NOT_FOUND;
+	}
+
+	@Override
+	public int updateEmployee(Employee employee) {
+		String employeeID = employee.getEmpID();
+		try {
 			dao.updateEntity(employee);
-			logger.info("STATUS CODE: " + StatusCode.OK + ": Employee details for Employee ID " + employeeID
-					+ " have been updated successfully.");
+
+			logger.info("STATUS CODE: " + StatusCode.OK + ": Employee details for employee '" + employeeID
+					+ "' have been updated successfully.");
+
 			return StatusCode.OK;
 		} catch (Exception exception) {
-			logger.error("STATUS CODE:" + StatusCode.DBEERROR + "\n" + getExceptionDetail(exception));
+			logger.error("STATUS CODE:" + StatusCode.DBEERROR
+					+ ": Exception occured while updating the employee details for employee '" + employeeID + "' \n"
+					+ getExceptionDetail(exception));
 			return StatusCode.DBEERROR;
 		}
 	}
@@ -126,31 +189,45 @@ public class EmployeeWSImpl implements EmployeeWS {
 	@Override
 	public int isAuthorized(String userID, char[] password) {
 		logger.info("Verifying credentials for User ID:" + userID);
+
 		if (isEmployee(userID)) {
-			LoginCredentials credentials = dao.get(LoginCredentials.class, userID);
+
+			LoginCredentials credentials = dao.getAndCache(LoginCredentials.class, userID);
 			if (credentials != null) {
 				try {
-					if (credentials.getFailedAttempts() != 5
+					if (credentials.getFailedAttempts() < 5
 							&& PasswordUtil.isvalidPassword(credentials.getPassword(), password)) {
+
 						credentials.setFailedAttempts(0);
 						updateLoginTimestamp(credentials);
 						dao.updateEntity(credentials);
 						logger.info("STATUS CODE: " + StatusCode.OK + ": Employee ID " + userID + " is authorized");
+
 						return StatusCode.OK;
-					} else if (credentials.getFailedAttempts() == 5) {
+					}
+
+					else if (credentials.getFailedAttempts() == 5) {
 						return StatusCode.LOCKED_OUT;
-					} else {
+					}
+
+					else {
 						updateInvalidLoginAttempt(credentials);
 						return StatusCode.FORBIDDEN;
 					}
-				} catch (InvalidKeySpecException | NoSuchAlgorithmException exception) {
+				}
+
+				catch (InvalidKeySpecException | NoSuchAlgorithmException exception) {
 					logger.error("STATUS CODE: " + StatusCode.INTERNAL_ERROR + "\n" + getExceptionDetail(exception));
 					return StatusCode.INTERNAL_ERROR;
 				}
-			} else {
+			}
+
+			else {
 				return StatusCode.NOT_SIGNED_UP;
 			}
-		} else {
+		}
+
+		else {
 			return StatusCode.NOT_FOUND;
 		}
 	}
@@ -166,17 +243,25 @@ public class EmployeeWSImpl implements EmployeeWS {
 					credentials.setPassword(PasswordUtil.encryptPassword(password));
 					credentials.setFailedAttempts(0);
 					dao.save(credentials);
+
 					logger.info("STATUS CODE: " + StatusCode.CREATED + ": Credentials for Employee ID " + userID
 							+ " have been successfully created");
+
 					return StatusCode.CREATED;
-				} catch (Exception exception) {
+				}
+
+				catch (Exception exception) {
 					logger.error("STATUS CODE: " + StatusCode.INTERNAL_ERROR + "\n" + getExceptionDetail(exception));
 					return StatusCode.INTERNAL_ERROR;
 				}
-			} else {
+			}
+
+			else {
 				return StatusCode.DUPLICATE;
 			}
-		} else {
+		}
+
+		else {
 			return StatusCode.NOT_FOUND;
 		}
 	}
@@ -187,15 +272,19 @@ public class EmployeeWSImpl implements EmployeeWS {
 
 		try {
 			boolean isValidOldPass = PasswordUtil.isvalidPassword(credentials.getPassword(), oldPassword);
+
 			if (credentials != null && credentials.getFailedAttempts() != 5 && isValidOldPass) {
 				credentials.setPassword(PasswordUtil.encryptPassword(newPassword));
 				dao.updateEntity(credentials);
+
 				return StatusCode.OK;
 			} else if (credentials != null && credentials.getFailedAttempts() == 5) {
 				logger.info("STATUS CODE: " + StatusCode.LOCKED_OUT
-						+ ": Could not update the password for locked out Employee ID '" + userID + "'");
+						+ ": Could not update the password for locked out employee '" + userID + "'");
+
 				return StatusCode.LOCKED_OUT;
 			} else {
+
 				return StatusCode.FORBIDDEN;
 			}
 		} catch (NoSuchAlgorithmException | InvalidKeySpecException exception) {
@@ -208,7 +297,9 @@ public class EmployeeWSImpl implements EmployeeWS {
 	// given userID.
 	@Override
 	public int updatePassword(String userID, String submittedOTP, char[] newPassword) {
+
 		if (isAlreadySignedUp(userID)) {
+
 			UserOTP usrOTP = dao.get(UserOTP.class, userID);
 			if (usrOTP != null) {
 				LoginCredentials credentials = dao.get(LoginCredentials.class, userID);
@@ -229,6 +320,7 @@ public class EmployeeWSImpl implements EmployeeWS {
 							logger.error("STATUS CODE: " + StatusCode.INTERNAL_ERROR
 									+ ": Error occured while updating password for user id '" + userID + "'\n"
 									+ getExceptionDetail(exception));
+
 							return StatusCode.INTERNAL_ERROR;
 						}
 					} else {
@@ -276,7 +368,8 @@ public class EmployeeWSImpl implements EmployeeWS {
 	@Override
 	public int markAttendance(Calendar workDay, String[] employeeIDs, String status) {
 		for (String empID : employeeIDs) {
-			EmployeeAttendance atndnc = dao.get(EmployeeAttendance.class, new EmployeeAttendance(workDay, empID));
+			EmployeeAttendance atndnc = dao.getAndCache(EmployeeAttendance.class,
+					new EmployeeAttendance(workDay, empID));
 			LocalDateTime now = LocalDateTime.now();
 			atndnc.setStatus(status);
 			atndnc.setTimestamp(now);
@@ -316,6 +409,7 @@ public class EmployeeWSImpl implements EmployeeWS {
 		}
 	}
 
+	@Override
 	public EmployeeAttendance[] getEmployeeAttendanceReport(String employeeID, Calendar startDate, Calendar endDate) {
 		Criteria criteria = dao.getCriteria(EmployeeAttendance.class, "Emp");
 
@@ -335,9 +429,9 @@ public class EmployeeWSImpl implements EmployeeWS {
 					+ getExceptionDetail(exception));
 			return null;
 		}
-
 	}
 
+	@Override
 	public EmployeeAttendance[] getAttendanceOnDate(Calendar workday) {
 		Criteria criteria = dao.getCriteria(EmployeeAttendance.class, "Emp");
 
@@ -630,7 +724,7 @@ public class EmployeeWSImpl implements EmployeeWS {
 
 	@Override
 	public boolean isSchoolAlreadyOpen(Calendar workDay) {
-		StartOfDay sod = dao.get(StartOfDay.class, workDay);
+		StartOfDay sod = dao.getAndCache(StartOfDay.class, workDay);
 		return sod != null;
 	}
 
@@ -679,7 +773,7 @@ public class EmployeeWSImpl implements EmployeeWS {
 
 	public static void main(String[] args) {
 		// new EmployeeWSImpl().getEmployee("1234");
-		new EmployeeWSImpl().deactivateEmployee("1234");
+		// new EmployeeWSImpl().deactivateEmployee("1234");
 		File f1 = new File("C:\\Users\\Home\\Desktop\\1.jpg");
 		File f2 = new File("C:\\Users\\Home\\Desktop\\CREATE_TABLE.sql");
 		File f3 = new File("C:\\Users\\Home\\Desktop\\possuite-141-dm-ddl.rar");
