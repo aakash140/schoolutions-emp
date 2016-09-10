@@ -14,13 +14,14 @@ import com.school.employee.bean.Employee;
 import com.school.employee.ws.EmployeeWSImpl;
 import com.school.util.DepartmentList;
 import com.school.util.DocumentProp;
+import com.school.util.search.EmployeeSearchCriteria;
 
 public class TestApp {
 
 	public static void main(String[] args) throws Exception {
 		EmployeeWSImpl empWs = new EmployeeWSImpl();
 
-		addEmp(empWs);
+/*		addEmp(empWs);
 		empWs.createCredentials("1234", "pass@123".toCharArray());
 
 		String fileName = "1.jpg";
@@ -31,7 +32,7 @@ public class TestApp {
 		int ownerType = DocumentProp.OWNER_EMP;
 		int fileType = DocumentProp.DP;
 		System.out.println(empWs.saveFile(dh, ownerID, ownerType, fileType));
-
+*/
 		// empWs.updatePassword("1234", "Pass@123".toCharArray(),
 		// "Pass@123".toCharArray());
 		// empWs.deactivateEmployee("1234");
@@ -42,7 +43,7 @@ public class TestApp {
 		// System.out.println(emp.getAddressSet().toArray());
 		// System.out.println(empWs.deactivateEmployee("1234"));
 		// empWs.updatePassword("1234", "abc4321", "pass@1234".toCharArray());
-		System.out.println(empWs.emailandSaveOTP("1234", "abc43212"));
+//		System.out.println(empWs.emailandSaveOTP("1234", "abc43212"));
 		Calendar dob = Calendar.getInstance();
 		dob.set(1990, 10, 20);
 
@@ -52,7 +53,21 @@ public class TestApp {
 		// Employee[] emps = empWs.searchEmployee("aAK", "guP", "9811569449",
 		// "male", "nent", dob, doj, "ab+", 2, "pal",
 		// 1);
-		long count = empWs.countEmployees("aAK", "guP", "male", "nent", dob, doj, "ab+", 2, "pal", 1);
+
+		EmployeeSearchCriteria sc = new EmployeeSearchCriteria();
+		sc.setfirstName("aAK");
+		sc.setlastName("guP");
+		sc.setlastName("guP");
+		sc.setGender("male");
+		sc.setEmployeeType("nent");
+		sc.setDob(dob);
+		sc.setDoj(doj);
+		sc.setBloodgroup("ab+");
+		sc.setDepartment(2);
+		sc.setDesignation("pal");
+		sc.setMaritalStatus(1);
+
+		long count = empWs.countEmployees(sc);
 		System.out.println(count);
 
 	}

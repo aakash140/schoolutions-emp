@@ -37,6 +37,7 @@ import com.school.util.EmailUtil;
 import com.school.util.FileIOUtil;
 import com.school.util.PasswordUtil;
 import com.school.util.StatusCode;
+import com.school.util.search.EmployeeSearchCriteria;
 
 @SuppressWarnings("deprecation")
 @WebService(endpointInterface = "com.school.employee.ws.EmployeeWS")
@@ -453,8 +454,18 @@ public class EmployeeWSImpl implements EmployeeWS {
 	}
 
 	@Override
-	public Employee[] searchEmployee(String fName, String lName, String contactNum, String gender, String employeeType,
-			Calendar dob, Calendar doj, String bloodgroup, int department, String designation, int maritalStatus) {
+	public Employee[] searchEmployees(EmployeeSearchCriteria searchCrt) {
+		String fName = searchCrt.getfirstName();
+		String lName = searchCrt.getlastName();
+		String contactNum = searchCrt.getContactNum();
+		String gender = searchCrt.getGender();
+		String employeeType = searchCrt.getEmployeeType();
+		Calendar dob = searchCrt.getDob();
+		Calendar doj = searchCrt.getDoj();
+		String bloodgroup = searchCrt.getBloodgroup();
+		int department = searchCrt.getDepartment();
+		String designation = searchCrt.getDesignation();
+		int maritalStatus = searchCrt.getMaritalStatus();
 
 		Criteria criteria = dao.getCriteria(Employee.class, "EMP");
 
@@ -510,66 +521,19 @@ public class EmployeeWSImpl implements EmployeeWS {
 			} else
 				return new Employee[list.size()];
 		} catch (Exception exception) {
-			logger.error("STATUS CODE: " + StatusCode.DBEERROR + ": An exception occured during employee lookup. "
+			logger.error("STATUS CODE: " + StatusCode.DBEERROR + ": An exception occured during employee lookup.\n"
 					+ getExceptionDetail(exception));
 			return null;
 		}
 
 	}
 
-	@Override
-	public long countEmployees(String fName, String lName, String gender, String employeeType, Calendar dob,
-			Calendar doj, String bloodgroup, int department, String designation, int maritalStatus) {
-		Criteria criteria = dao.getCriteria(Employee.class, "EMP");
-
-		if (fName != null && fName.length() > 0)
-			criteria.add(Restrictions.ilike("EMP.firstName", fName + "%"));
-
-		if (lName != null && lName.length() > 0)
-			criteria.add(Restrictions.ilike("EMP.lastName", lName + "%"));
-
-		if (gender != null && gender.length() > 0)
-			criteria.add(Restrictions.eq("EMP.gender", gender).ignoreCase());
-
-		if (employeeType != null && employeeType.length() > 0)
-			criteria.add(Restrictions.ilike("EMP.employeeType", "%" + employeeType + "%"));
-
-		if (dob != null)
-			criteria.add(Restrictions.ge("EMP.DOB", dob));
-
-		if (doj != null)
-			criteria.add(Restrictions.ge("EMP.DOJ", doj));
-
-		if (bloodgroup != null && bloodgroup.length() > 0)
-			criteria.add(Restrictions.eq("EMP.bloodGroup", bloodgroup).ignoreCase());
-
-		if (department >= 0)
-			criteria.add(Restrictions.eq("EMP.department", department));
-
-		if (designation != null && designation.length() > 0)
-			criteria.add(Restrictions.ilike("EMP.designation", "%" + designation + "%"));
-
-		if (maritalStatus >= 0)
-			criteria.add(Restrictions.eq("EMP.maritalStatus", maritalStatus));
-
-		criteria.add(Restrictions.eq("EMP.status", 1));
-
-		criteria.setProjection(Projections.rowCount());
-
-		try {
-			List<Object> list = dao.getSearchResult(criteria);
-
-			if (list.size() > 0) {
-				Long recordsNum = (Long) list.get(0);
-				return recordsNum;
-			} else
-				return 0L;
-		} catch (Exception exception) {
-			logger.error("STATUS CODE: " + StatusCode.DBEERROR + ": An exception occured during employee lookup.\n "
-					+ getExceptionDetail(exception));
-			return -1L;
-		}
-
+	public long countEmployees(EmployeeSearchCriteria searchCrt) {
+		Employee[] emps = searchEmployees(searchCrt);
+		if (emps != null)
+			return emps.length;
+		else
+			return 0;
 	}
 
 	@Override

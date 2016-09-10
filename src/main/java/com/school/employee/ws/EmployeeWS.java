@@ -13,6 +13,7 @@ import javax.jws.WebService;
 import com.school.employee.bean.Employee;
 import com.school.employee.bean.EmployeeAttendance;
 import com.school.employee.bean.StartOfDay;
+import com.school.util.search.EmployeeSearchCriteria;
 
 @WebService
 public interface EmployeeWS {
@@ -79,24 +80,11 @@ public interface EmployeeWS {
 	@WebResult(partName = "AttendanceArray")
 	public EmployeeAttendance[] getAttendanceOnDate(@WebParam(partName = "WorkDate") Calendar workday);
 
-	@WebMethod(operationName = "lookupEmployee")
-	@WebResult(partName = "EmployeeArray")
-	public Employee[] searchEmployee(@WebParam(partName = "firstName") String fName,
-			@WebParam(partName = "lastName") String lName, @WebParam(partName = "contactNumber") String contactNum,
-			@WebParam(partName = "gender") String gender, @WebParam(partName = "employeeType") String employeeType,
-			@WebParam(partName = "DOB") Calendar dob, @WebParam(partName = "DOJ") Calendar doj,
-			@WebParam(partName = "bloodGroup") String bloodgroup, @WebParam(partName = "departmentID") int department,
-			@WebParam(partName = "designation") String designation,
-			@WebParam(partName = "maritalStatus") int maritalStatus);
+	@WebResult(partName = "EmplyeeArray")
+	public Employee[] searchEmployees(EmployeeSearchCriteria searchCrt);
 
-	@WebMethod(operationName = "countEmployees")
 	@WebResult(partName = "ResultCount")
-	public long countEmployees(@WebParam(partName = "firstName") String fName,
-			@WebParam(partName = "lastName") String lName, @WebParam(partName = "gender") String gender,
-			@WebParam(partName = "employeeType") String employeeType, @WebParam(partName = "DOB") Calendar dob,
-			@WebParam(partName = "DOJ") Calendar doj, @WebParam(partName = "bloodGroup") String bloodgroup,
-			@WebParam(partName = "departmentID") int department, @WebParam(partName = "designation") String designation,
-			@WebParam(partName = "maritalStatus") int maritalStatus);
+	public long countEmployees(EmployeeSearchCriteria searchCrt);
 
 	@WebMethod(operationName = "downloadFile")
 	@WebResult(partName = "ByteArray")
