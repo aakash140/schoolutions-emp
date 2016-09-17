@@ -72,16 +72,17 @@ public class EmployeeAttendance implements Serializable {
 
 		EmployeeAttendance atndnc = (EmployeeAttendance) obj;
 
-		boolean isworkdayequal = workDay == atndnc.workDay
-				|| (workDay != null && workDay.compareTo(atndnc.getWorkDay()) == 0);
+		boolean isworkdayequal = getWorkDay() == atndnc.getWorkDay()
+				|| (getWorkDay() != null && getWorkDay().compareTo(atndnc.getWorkDay()) == 0);
 
-		boolean isEmpIDEqual = employeeID == atndnc.getEmployeeID()
-				|| (employeeID != null && employeeID.equalsIgnoreCase(atndnc.getEmployeeID()));
+		boolean isEmpIDEqual = getEmployeeID() == atndnc.getEmployeeID()
+				|| (getEmployeeID() != null && getEmployeeID().equalsIgnoreCase(atndnc.getEmployeeID()));
 
-		boolean isStatusEqual = status == atndnc.getStatus() || (status != null && status.equals(atndnc.getStatus()));
+		boolean isStatusEqual = getStatus() == atndnc.getStatus()
+				|| (getStatus() != null && getStatus().equals(atndnc.getStatus()));
 
-		boolean isTmpstmpEqual = timestamp == atndnc.getTimestamp()
-				|| (timestamp != null && timestamp.compareTo(atndnc.getTimestamp()) == 0);
+		boolean isTmpstmpEqual = getTimestamp() == atndnc.getTimestamp()
+				|| (getTimestamp() != null && getTimestamp().compareTo(atndnc.getTimestamp()) == 0);
 
 		if (isworkdayequal && isEmpIDEqual && isStatusEqual && isTmpstmpEqual)
 			return true;
@@ -93,8 +94,8 @@ public class EmployeeAttendance implements Serializable {
 	public int hashCode() {
 		int hash = 7;
 
-		hash = 31 * hash + (employeeID == null ? 0 : employeeID.hashCode());
-		hash = 31 * hash + (status == null ? 0 : status.hashCode());
+		hash = 31 * hash + (getEmployeeID() == null ? 0 : getEmployeeID().hashCode());
+		hash = 31 * hash + (getStatus() == null ? 0 : getStatus().hashCode());
 
 		return hash;
 	}

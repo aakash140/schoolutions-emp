@@ -68,13 +68,13 @@ public class DocumentRecords implements Serializable {
 
 		DocumentRecords doc = (DocumentRecords) obj;
 
-		boolean isOwnerIDequal = ownerID == doc.getOwnerID()
-				|| (ownerID != null && ownerID.equalsIgnoreCase(doc.getOwnerID()));
+		boolean isOwnerIDequal = getOwnerID() == doc.getOwnerID()
+				|| (getOwnerID() != null && getOwnerID().equalsIgnoreCase(doc.getOwnerID()));
 
-		boolean isDocTypeEqual = docType == doc.getDocType();
+		boolean isDocTypeEqual = getDocType() == doc.getDocType();
 
-		boolean isDocLocEqual = docLocation == doc.getDocLocation()
-				|| (docLocation != null && docLocation.equalsIgnoreCase(doc.getDocLocation()));
+		boolean isDocLocEqual = getDocLocation() == doc.getDocLocation()
+				|| (getDocLocation() != null && getDocLocation().equalsIgnoreCase(doc.getDocLocation()));
 
 		if (isOwnerIDequal && isDocTypeEqual && isDocLocEqual)
 			return true;
@@ -84,9 +84,9 @@ public class DocumentRecords implements Serializable {
 
 	@Override
 	public int hashCode() {
-		int hash = 7 + docType;
-		hash = 31 * hash + (null == ownerID ? 0 : ownerID.hashCode());
-		hash = 31 * hash + (null == docLocation ? 0 : docLocation.hashCode());
+		int hash = 7 + getDocType();
+		hash = 31 * hash + (null == getOwnerID() ? 0 : getOwnerID().hashCode());
+		hash = 31 * hash + (null == getDocLocation() ? 0 : getDocLocation().hashCode());
 		return hash;
 	}
 }
