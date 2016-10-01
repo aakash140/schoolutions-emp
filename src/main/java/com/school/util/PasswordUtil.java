@@ -22,6 +22,9 @@ public class PasswordUtil {
 
 		PBEKeySpec keySpec = new PBEKeySpec(password, salt, iterations, 16 * 8);
 		SecretKeyFactory skf = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
+
+		// Length of the byte[] hash will be the (4th arg)/8 of PBEKeySpec
+		// constructor above called. e.g. in this case it will be 16.
 		byte[] hash = skf.generateSecret(keySpec).getEncoded();
 
 		// byte arrays of salt and hash contain values in decimal format.
@@ -47,12 +50,10 @@ public class PasswordUtil {
 		SecretKeyFactory skf = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
 		byte[] tempHash = skf.generateSecret(keySpec).getEncoded();
 
-		// Compare length equality bitwise.diff will become 1 if any of the bit
-		// is unequal.
+		// Compare length equality
 		int diff = hash.length ^ tempHash.length;
 
-		// Compare each bit of password.diff will become 1 if any of the bit is
-		// unequal.
+		// Compare each bit of password hash.
 		for (int i = 0; i < hash.length && i < tempHash.length; i++)
 			diff |= hash[i] ^ tempHash[i];
 
