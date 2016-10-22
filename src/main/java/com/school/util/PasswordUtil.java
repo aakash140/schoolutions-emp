@@ -4,6 +4,7 @@ import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
+import java.util.Arrays;
 
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
@@ -99,7 +100,6 @@ public class PasswordUtil {
 
 	private static void maskPassword(char[] password) {
 		logger.info("Masking the entered password");
-		for (int i = 0; i < password.length; i++)
-			password[i] = '#';
+		Arrays.fill(password, '#');
 	}
 }
