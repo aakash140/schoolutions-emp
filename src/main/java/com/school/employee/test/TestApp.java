@@ -1,19 +1,14 @@
 package com.school.employee.test;
 
-import java.io.File;
 import java.util.Calendar;
 import java.util.HashSet;
 import java.util.Set;
-
-import javax.activation.DataHandler;
-import javax.activation.FileDataSource;
 
 import com.school.employee.bean.Address;
 import com.school.employee.bean.ContactDetails;
 import com.school.employee.bean.Employee;
 import com.school.employee.ws.EmployeeWSImpl;
 import com.school.util.DepartmentList;
-import com.school.util.DocumentProp;
 import com.school.util.search.EmployeeSearchCriteria;
 
 public class TestApp {
@@ -21,18 +16,17 @@ public class TestApp {
 	public static void main(String[] args) throws Exception {
 		EmployeeWSImpl empWs = new EmployeeWSImpl();
 
-/*		addEmp(empWs);
-		empWs.createCredentials("1234", "pass@123".toCharArray());
-
-		String fileName = "1.jpg";
-		File file = new File("C:/Users/Home/Desktop/" + fileName);
-		FileDataSource fds = new FileDataSource(file);
-		DataHandler dh = new DataHandler(fds);
-		String ownerID = "1234";
-		int ownerType = DocumentProp.OWNER_EMP;
-		int fileType = DocumentProp.DP;
-		System.out.println(empWs.saveFile(dh, ownerID, ownerType, fileType));
-*/
+		/*
+		 * addEmp(empWs); empWs.createCredentials("1234",
+		 * "pass@123".toCharArray());
+		 *
+		 * String fileName = "1.jpg"; File file = new
+		 * File("C:/Users/Home/Desktop/" + fileName); FileDataSource fds = new
+		 * FileDataSource(file); DataHandler dh = new DataHandler(fds); String
+		 * ownerID = "1234"; int ownerType = DocumentProp.OWNER_EMP; int
+		 * fileType = DocumentProp.DP; System.out.println(empWs.saveFile(dh,
+		 * ownerID, ownerType, fileType));
+		 */
 		// empWs.updatePassword("1234", "Pass@123".toCharArray(),
 		// "Pass@123".toCharArray());
 		// empWs.deactivateEmployee("1234");
@@ -43,7 +37,7 @@ public class TestApp {
 		// System.out.println(emp.getAddressSet().toArray());
 		// System.out.println(empWs.deactivateEmployee("1234"));
 		// empWs.updatePassword("1234", "abc4321", "pass@1234".toCharArray());
-//		System.out.println(empWs.emailandSaveOTP("1234", "abc43212"));
+		// System.out.println(empWs.emailandSaveOTP("1234", "abc43212"));
 		Calendar dob = Calendar.getInstance();
 		dob.set(1990, 10, 20);
 
@@ -55,19 +49,16 @@ public class TestApp {
 		// 1);
 
 		EmployeeSearchCriteria sc = new EmployeeSearchCriteria();
-		sc.setfirstName("aAK");
-		sc.setlastName("guP");
-		sc.setlastName("guP");
-		sc.setGender("male");
-		sc.setEmployeeType("nent");
-		sc.setDob(dob);
-		sc.setDoj(doj);
-		sc.setBloodgroup("ab+");
-		sc.setDepartment(2);
-		sc.setDesignation("pal");
-		sc.setMaritalStatus(1);
+		/*
+		 * sc.setfirstName("aAK"); sc.setlastName("guP"); sc.setlastName("guP");
+		 * sc.setGender("male"); sc.setEmployeeType("nent"); sc.setDob(dob);
+		 * sc.setDoj(doj); sc.setBloodgroup("ab+"); sc.setDepartment(2);
+		 * sc.setDesignation("pal"); sc.setMaritalStatus(1);
+		 */
 
+		sc.setContactNum("9811553413");
 		long count = empWs.countEmployees(sc);
+		// empWs.sendAnEmail("1234", "Hello", "Test Mail", null);
 		System.out.println(count);
 
 	}
@@ -94,7 +85,7 @@ public class TestApp {
 		adrs1.setCity("GZB");
 		adrs1.setPincode("110051");
 
-		Set<Address> adrsSet = new HashSet<Address>();
+		Set<Address> adrsSet = new HashSet<>();
 		adrsSet.add(adrs);
 		adrsSet.add(adrs1);
 

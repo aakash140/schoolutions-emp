@@ -17,6 +17,9 @@
 		class="com.school.employee.ws.EmployeeWSImpl">
 	</bean>
 
+	<!--This can be eliminated by using @Autowired and @Repository annotation in EmployeeDAOImpl.-->
+	<!-- Also use PersistenceExceptionTranslationPostProcessor for Spring specific exceptions.
+		 Refer page 163 Spring in Action 3rd Edition -->
 	<bean 
 		id="employeeDAO" 
 		class="com.school.employee.dao.EmployeeDAOImpl">
@@ -26,6 +29,7 @@
 		 </property>
 	</bean>
 	
+	<!-- POJOs can be eliminated by using annotation. -->
 	<bean 
 		id="employeePOJO" 
 		class="com.school.employee.bean.Employee" 
@@ -56,12 +60,24 @@
 		scope="prototype">
 	</bean>
 	
-		<bean 
+	<bean 
 		id="userOTPPOJO" 
 		class="com.school.employee.bean.UserOTP"
 		scope="prototype">
 	</bean>
-		
+
+	<bean 
+		id="sodPOJO" 
+		class="com.school.employee.bean.StartOfDay"
+		scope="prototype">
+	</bean>
+
+	<bean 
+		id="empAtndncPOJO" 
+		class="com.school.employee.bean.EmployeeAttendance"
+		scope="prototype">
+	</bean>
+			
 	<bean 
 		id="dataSource" 
 		class="org.apache.commons.dbcp.BasicDataSource">
@@ -83,22 +99,11 @@
 		</property>
 	</bean>
 
-<!-- 	<bean id="hibernateProperties" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
-		<property name="properties">
-			<props>
-				<prop key="hibernate.dialect">org.hibernate.dialect.Oracle10gDialect</prop>
-				<prop key="hibernate.hbm2ddl.auto">create</prop>
-				<prop key="hibernate.show_sql">true</prop>
-				<prop key="hibernate.cache.use_second_level_cache">true</prop>
-				<prop key="hibernate.cache.region.factory_class" >org.hibernate.cache.ehcache.SingletonEhCacheRegionFactory</prop>
-				<prop key="net.sf.ehcache.configurationResourceName" >/ehcache.xml</prop>
-			</props>
-		</property>
-	</bean> -->
-
 	<bean id="sessionFactory"
 		class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
+		
 		<property name="dataSource" ref="dataSource"></property>
+		
 		<property name="mappingResources">
 			<list>
 				<value>contact.hbm.xml</value>
@@ -107,8 +112,11 @@
 				<value>address.hbm.xml</value>
 				<value>document.hbm.xml</value>
 				<value>otp.hbm.xml</value>
+				<value>sod.hbm.xml</value>
+				<value>empAtndnc.hbm.xml</value>
 			</list>
 		</property>
+		
 		<property name="hibernateProperties" >
 			<props>
 				<prop key="hibernate.dialect">org.hibernate.dialect.Oracle10gDialect</prop>

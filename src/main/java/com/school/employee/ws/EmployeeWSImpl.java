@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.activation.DataHandler;
-import javax.activation.FileDataSource;
 import javax.jws.WebService;
 
 import org.apache.log4j.Logger;
@@ -482,6 +481,34 @@ public class EmployeeWSImpl implements EmployeeWS {
 			Criterion whatsApp = Restrictions.eq("CNTCT.whatsAppNumber", contactNum);
 			Disjunction expr = Restrictions.or(mob1, mob2, whatsApp);
 			criteria.add(expr);
+
+			/*
+			 * * Following are 2 alternative ways to use associations with
+			 * Criteria
+			 *
+			 */
+
+			//////// Method 1:
+
+			// Criteria phoneCrit = criteria.createCriteria("contact");
+			// Criterion mob1 = Restrictions.eq("mobileNumber1",
+			// contactNum);
+			// Criterion mob2 = Restrictions.eq("mobileNumber2",
+			// contactNum);
+			// Criterion whatsApp = Restrictions.eq("whatsAppNumber",
+			// contactNum);
+			// Disjunction expr = Restrictions.or(mob1, mob2, whatsApp);
+			// phoneCrit.add(expr);
+
+			//////// Method 2:
+			// Employee emp = new Employee();
+			// ContactDetails con = new ContactDetails();
+			// con.setMobileNumber1("9811553413");
+			// emp.setContact(con);
+			// Example exp = Example.create(emp);
+			// exp.excludeZeroes();
+			// criteria.add(exp);
+
 		}
 
 		if (gender != null && gender.length() > 0)
@@ -528,6 +555,7 @@ public class EmployeeWSImpl implements EmployeeWS {
 
 	}
 
+	@Override
 	public long countEmployees(EmployeeSearchCriteria searchCrt) {
 		Employee[] emps = searchEmployees(searchCrt);
 		if (emps != null)
@@ -735,35 +763,32 @@ public class EmployeeWSImpl implements EmployeeWS {
 		return sb.toString();
 	}
 
-	public static void main(String[] args) {
-		// new EmployeeWSImpl().getEmployee("1234");
-		// new EmployeeWSImpl().deactivateEmployee("1234");
-		File f1 = new File("C:\\Users\\Home\\Desktop\\1.jpg");
-		File f2 = new File("C:\\Users\\Home\\Desktop\\CREATE_TABLE.sql");
-		File f3 = new File("C:\\Users\\Home\\Desktop\\possuite-141-dm-ddl.rar");
-
-		DataHandler dh1 = new DataHandler(new FileDataSource(f1));
-		DataHandler dh2 = new DataHandler(new FileDataSource(f2));
-		DataHandler dh3 = new DataHandler(new FileDataSource(f3));
-
-		DataHandler[] dh = new DataHandler[] { dh1, dh2, dh3 };
-		// String[] recepientList = new String[] { "aakash.gupta140@gmail.com",
-		// "aakash.gupta140@outlook.com",
-		// "vikas.gupta0502@outlook.com", "pkgn1965@gmail.com" };
-		// new EmployeeWSImpl().sendAnEmail("1234", "Test", "Test", dh);
-		String[] empIDs = new String[] { "1234", "4321", "1111" };
-		// int result = new EmployeeWSImpl().beginSchoolSession(new Date(2016,
-		// 7, 26), "1234");
-		// int result = new EmployeeWSImpl().markAttendance(new Date(2016, 9,
-		// 26), empIDs, "1");
-
-		Calendar sd = Calendar.getInstance();
-		sd.set(2016, 7, 25);
-
-		Calendar ed = Calendar.getInstance();
-		ed.set(2016, 7, 27);
-
-		StartOfDay[] result = new EmployeeWSImpl().getWorkDays(ed, ed);
-		System.out.println(result);
-	}
+	/*
+	 * public static void main(String[] args) { // new
+	 * EmployeeWSImpl().getEmployee("1234"); // new
+	 * EmployeeWSImpl().deactivateEmployee("1234"); File f1 = new
+	 * File("C:\\Users\\Home\\Desktop\\1.jpg"); File f2 = new
+	 * File("C:\\Users\\Home\\Desktop\\CREATE_TABLE.sql"); File f3 = new
+	 * File("C:\\Users\\Home\\Desktop\\possuite-141-dm-ddl.rar");
+	 *
+	 * DataHandler dh1 = new DataHandler(new FileDataSource(f1)); DataHandler
+	 * dh2 = new DataHandler(new FileDataSource(f2)); DataHandler dh3 = new
+	 * DataHandler(new FileDataSource(f3));
+	 *
+	 * DataHandler[] dh = new DataHandler[] { dh1, dh2, dh3 }; // String[]
+	 * recepientList = new String[] { "aakash.gupta140@gmail.com", //
+	 * "aakash.gupta140@outlook.com", // "vikas.gupta0502@outlook.com",
+	 * "pkgn1965@gmail.com" }; // new EmployeeWSImpl().sendAnEmail("1234",
+	 * "Test", "Test", dh); String[] empIDs = new String[] { "1234", "4321",
+	 * "1111" }; // int result = new EmployeeWSImpl().beginSchoolSession(new
+	 * Date(2016, // 7, 26), "1234"); // int result = new
+	 * EmployeeWSImpl().markAttendance(new Date(2016, 9, // 26), empIDs, "1");
+	 *
+	 * Calendar sd = Calendar.getInstance(); sd.set(2016, 7, 25);
+	 *
+	 * Calendar ed = Calendar.getInstance(); ed.set(2016, 7, 27);
+	 *
+	 * StartOfDay[] result = new EmployeeWSImpl().getWorkDays(ed, ed);
+	 * System.out.println(result); }
+	 */
 }

@@ -17,6 +17,9 @@
 		class="com.school.employee.ws.EmployeeWSImpl">
 	</bean>
 
+	<!--This can be eliminated by using @Autowired and @Repository annotation in EmployeeDAOImpl.-->
+	<!-- Also use PersistenceExceptionTranslationPostProcessor for Spring specific exceptions.
+		 Refer page 163 Spring in Action 3rd Edition -->
 	<bean 
 		id="employeeDAO" 
 		class="com.school.employee.dao.EmployeeDAOImpl">
@@ -26,6 +29,7 @@
 		 </property>
 	</bean>
 	
+	<!-- POJOs can be eliminated by using annotation. -->
 	<bean 
 		id="employeePOJO" 
 		class="com.school.employee.bean.Employee" 
@@ -97,7 +101,9 @@
 
 	<bean id="sessionFactory"
 		class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
+		
 		<property name="dataSource" ref="dataSource"></property>
+		
 		<property name="mappingResources">
 			<list>
 				<value>contact.hbm.xml</value>

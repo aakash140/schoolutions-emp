@@ -106,6 +106,7 @@
 	<!-- Hibernate Dependencies End -->
 	
 
+	<!-- Use ojdbc7 using Oracle's repository -->
 	<!--Install the ojdbc6.jar in local repository,before adding the following 
 		dependency. -->
 	<dependency>

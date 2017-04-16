@@ -1,5 +1,7 @@
 F:\Schoolutions_WorkSpace\Employee\src\main\java\com\school\employee\ws\EmployeeWSImpl.java
 F:\Schoolutions_WorkSpace\Employee\src\main\java\com\school\employee\bean\UserOTP.java
+F:\Schoolutions_WorkSpace\Employee\src\main\java\com\school\util\search\EmployeeSearchCriteria.java
+F:\Schoolutions_WorkSpace\Employee\src\main\java\com\school\util\search\StudentSearchCriteria.java
 F:\Schoolutions_WorkSpace\Employee\src\main\java\com\school\util\FileIOUtil.java
 F:\Schoolutions_WorkSpace\Employee\src\main\java\com\school\employee\dao\EmployeeDAOImpl.java
 F:\Schoolutions_WorkSpace\Employee\src\main\java\com\school\employee\bean\ContactDetails.java
@@ -9,9 +11,13 @@ F:\Schoolutions_WorkSpace\Employee\src\main\java\com\school\employee\bean\Employ
 F:\Schoolutions_WorkSpace\Employee\src\main\java\com\school\employee\dao\EmployeeDAO.java
 F:\Schoolutions_WorkSpace\Employee\src\main\java\com\school\util\EmailUtil.java
 F:\Schoolutions_WorkSpace\Employee\src\main\java\com\school\employee\bean\LoginCredentials.java
+F:\Schoolutions_WorkSpace\Employee\src\main\java\com\school\employee\bean\StartOfDay.java
+F:\Schoolutions_WorkSpace\Employee\src\main\java\com\school\employee\bean\EmployeeAttendance.java
 F:\Schoolutions_WorkSpace\Employee\src\main\java\com\school\util\DepartmentList.java
+F:\Schoolutions_WorkSpace\Employee\src\main\java\com\school\util\search\PeopleSearchCriteria.java
 F:\Schoolutions_WorkSpace\Employee\src\main\java\com\school\employee\test\TestApp.java
 F:\Schoolutions_WorkSpace\Employee\src\main\java\com\school\util\StatusCode.java
 F:\Schoolutions_WorkSpace\Employee\src\main\java\com\school\util\DocumentProp.java
 F:\Schoolutions_WorkSpace\Employee\src\main\java\com\school\util\PasswordUtil.java
 F:\Schoolutions_WorkSpace\Employee\src\main\java\com\school\employee\bean\Address.java
+F:\Schoolutions_WorkSpace\Employee\src\main\java\com\school\util\AttendanceType.java
