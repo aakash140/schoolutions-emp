@@ -118,6 +118,9 @@ public class EmployeeWSImpl implements EmployeeWS {
 		}
 	}
 
+	/**
+	 * Here loginID refers to the ID of the user who is activating the employee.
+	 */
 	@Override
 	public int activateEmployee(String loginID, String employeeID) {
 		try {
